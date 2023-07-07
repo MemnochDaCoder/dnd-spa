@@ -175,15 +175,19 @@ export default {
             this.showApplyButton = true;
         },
         selectSpell(index) {
-            this.fetchSpellDetails(index)
-                .then((spellDetails) => {
-                    this.currentSpell = spellDetails;
-                })
-                .catch((error) => {
-                    console.error('Error fetching spell details:', error);
-                });
+            if (this.currentSpell && this.currentSpell.index === index) {
+                this.currentSpell = null;
+            } else {
+                this.fetchSpellDetails(index)
+                    .then((spellDetails) => {
+                        this.currentSpell = spellDetails;
+                    })
+                    .catch((error) => {
+                        console.error('Error fetching spell details:', error);
+                    });
+            }
         },
-    },
+    }
 };
 </script>
   
