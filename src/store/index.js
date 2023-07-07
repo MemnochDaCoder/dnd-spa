@@ -54,7 +54,7 @@ export default createStore({
       } catch (error) {
         console.error('Error fetching spells:', error);
       }
-    },
+    },    
 
     async fetchSpellDetails({ commit }, spellIndex) {
       try {
