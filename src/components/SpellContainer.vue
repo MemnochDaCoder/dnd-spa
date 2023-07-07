@@ -4,68 +4,68 @@
             <div class="filter-row">
                 <div>
                     <MultiSelect v-model="selectedLevels" :options="levelOptions" :multiple="true"
-                        placeholder="Select a spell level." track-by="value" label="label" />
+                        placeholder="Select a spell level." track-by="value" label="label" :close-on-select="false" />
                 </div>
                 <div>
                     <MultiSelect v-model="selectedSchools" :options="schoolOptions" :multiple="true"
-                        placeholder="Select a school." />
+                        placeholder="Select a school." :close-on-select="false" />
                 </div>
                 <div>
-                    <button class="btn btn-outline-primary" type="button" @click="applyFilters">Apply</button>
+                    <button class="btn btn-outline-primary" type="button" @click="applyFiltersAndShowButton">Apply</button>
                 </div>
             </div>
         </div>
         <div v-if="showApplyButton">
-            <div v-if="filterSpells && filterSpells.length > 0">
-                <div v-for="level in selectedLevels" :key="level">
-                    <h2>Level {{ level }}</h2>
-                    <div class="list-group">
-                        <button v-for="spell in filterSpells" :key="spell.index"
-                            class="list-group-item list-group-item-action button" aria-current="true"
-                            @click="selectSpell(spell.index)">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">{{ spell.name }}</h5>
-                                <small v-if="spell.level !== undefined">Level: {{ spell.level }}</small>
-                            </div>
-                            <div class="mb-1" v-if="currentSpell && currentSpell.index === spell.index">
-                                <table class="table">
-                                    <tbody>
-                                        <tr>
-                                            <td class="spellheader">Range</td>
-                                            <td>{{ currentSpell.range }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="spellheader">Components</td>
-                                            <td>{{ currentSpell.components }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="spellheader">Ritual</td>
-                                            <td>{{ currentSpell.ritual ? 'Yes' : 'No' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="spellheader">Duration</td>
-                                            <td>{{ currentSpell.duration }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="spellheader">Concentration</td>
-                                            <td>{{ currentSpell.concentration ? 'Yes' : 'No' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="spellheader">Casting Time</td>
-                                            <td>{{ currentSpell.casting_time }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="spellheader">Description</td>
-                                            <td>
-                                                <ul>
-                                                    <li v-for="desc in currentSpell.desc" :key="desc">{{ desc }}</li>
-                                                </ul>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </button>
+            <div v-for="item in filterSpells" :key="item.level">
+                <h2>{{ (levelOptions.find(option => option.value === item.level) || {}).label }}</h2>
+                <div class="list-group">
+                    <div v-for="(index) in item.spells" :key="index">
+                        <h2>{{ levelOptions.find(option => option.value === level).label }}</h2>
+                        <div class="list-group">
+                            <button v-for="spell in spells" :key="spell.index"
+                                class="list-group-item list-group-item-action button" aria-current="true"
+                                @click="selectSpell(spell.index)">
+                                <div class="mb-1"
+                                    v-if="currentSpell && currentSpell.index === spell.index && showApplyButton">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td class="spellheader">Range</td>
+                                                <td>{{ currentSpell.range }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="spellheader">Components</td>
+                                                <td>{{ currentSpell.components }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="spellheader">Ritual</td>
+                                                <td>{{ currentSpell.ritual ? 'Yes' : 'No' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="spellheader">Duration</td>
+                                                <td>{{ currentSpell.duration }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="spellheader">Concentration</td>
+                                                <td>{{ currentSpell.concentration ? 'Yes' : 'No' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="spellheader">Casting Time</td>
+                                                <td>{{ currentSpell.casting_time }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="spellheader">Description</td>
+                                                <td>
+                                                    <ul>
+                                                        <li v-for="desc in currentSpell.desc" :key="desc">{{ desc }}</li>
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -124,7 +124,6 @@
     </div>
 </template>
   
-  
 <script>
 import { mapActions, mapGetters } from 'vuex';
 import '../styles/style.scss';
@@ -166,12 +165,14 @@ export default {
     },
     mounted() {
         this.fetchSpells();
-        this.applyFilters();
         this.showApplyButton = false;
     },
     methods: {
         ...mapActions(['fetchSpells', 'fetchSpellDetails', 'applyFilters']),
-        applyFilters() {
+        applyFiltersAndShowButton() {
+            let levelValues = this.selectedLevels.map(level => level.value);
+            var s = this.selectedSchools;
+            this.applyFilters({ levels: levelValues, schools: s });
             this.showApplyButton = true;
         },
         selectSpell(index) {
