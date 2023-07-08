@@ -1,13 +1,14 @@
+import { createStore } from 'vuex';
 import { fetchSpells, fetchSpellsByLevelAndSchool, fetchSpellDetails } from '../api/api.js';
 
-export const state = {
+const state = {
   spells: [],
   selectedLevels: [],
   selectedSchools: [],
   selectedSpell: null,
 };
 
-export const mutations = {
+const mutations = {
   SET_SPELLS(state, spells) {
     state.spells = spells;
   },
@@ -22,7 +23,7 @@ export const mutations = {
   },
 };
 
-export const actions = {
+const actions = {
   async fetchSpells({ commit, state }) {
     const { selectedLevels, selectedSchools } = state;
     if (selectedLevels.length === 0 && selectedSchools.length === 0) {
@@ -56,7 +57,13 @@ export const actions = {
   },
 };
 
-export const getters = {
+const getters = {
+  spells: (state) => {
+    return state.spells;
+  },
+  getSpellByIndex: (state) => (spellIndex) => {
+    return state.spells.find((spell) => spell.index === spellIndex);
+  },
   filteredAndGroupedSpells(state) {
     const spellsByLevel = {};
     const { spells } = state;
@@ -101,3 +108,12 @@ export const getters = {
     return schoolOptions;
   },
 };
+
+const store = createStore({
+  state,
+  mutations,
+  actions,
+  getters,
+});
+
+export default store;

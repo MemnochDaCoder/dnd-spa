@@ -126,45 +126,45 @@
                     aria-current="true" @click="selectSpell(spell.index)">
                     <div class="d-flex w-100 justify-content-between">
                         <h5 class="mb-1">{{ spell.name }}</h5>
-                        <small v-if="spell.level !== undefined">Level: {{ spell.level }}</small>
-                    </div>
-                    <div class="mb-1" v-if="currentSpell && currentSpell.index === spell.index">
-                        <table class="table">
-                            <tbody>
-                                <tr>
-                                    <td class="spellheader">Range</td>
-                                    <td>{{ currentSpell.range }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="spellheader">Components</td>
-                                    <td>{{ currentSpell.components }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="spellheader">Ritual</td>
-                                    <td>{{ currentSpell.ritual ? 'Yes' : 'No' }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="spellheader">Duration</td>
-                                    <td>{{ currentSpell.duration }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="spellheader">Concentration</td>
-                                    <td>{{ currentSpell.concentration ? 'Yes' : 'No' }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="spellheader">Casting Time</td>
-                                    <td>{{ currentSpell.casting_time }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="spellheader">Description</td>
-                                    <td>
-                                        <ul>
-                                            <li v-for="desc in currentSpell.desc" :key="desc">{{ desc }}</li>
-                                        </ul>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <small v-if="spell.level">Level: {{ spell.level }}</small>
+                        <div class="mb-1" v-if="currentSpell && currentSpell.index === spell.index">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td class="spellheader">Range</td>
+                                        <td>{{ currentSpell.range }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="spellheader">Components</td>
+                                        <td>{{ currentSpell.components }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="spellheader">Ritual</td>
+                                        <td>{{ currentSpell.ritual ? 'Yes' : 'No' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="spellheader">Duration</td>
+                                        <td>{{ currentSpell.duration }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="spellheader">Concentration</td>
+                                        <td>{{ currentSpell.concentration ? 'Yes' : 'No' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="spellheader">Casting Time</td>
+                                        <td>{{ currentSpell.casting_time }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="spellheader">Description</td>
+                                        <td>
+                                            <ul>
+                                                <li v-for="desc in currentSpell.desc" :key="desc">{{ desc }}</li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </button>
             </div>
@@ -173,69 +173,104 @@
 </template>
   
 <script>
-import MultiSelect from 'vue-multiselect';
 import { mapGetters, mapActions } from 'vuex';
+import MultiSelect from 'vue-multiselect';
 
 export default {
-  components: {
-    MultiSelect,
-  },
-  data() {
-    return {
-      selectedLevels: [],
-      selectedSchools: [],
-      showApplyButton: false,
-      selectedSpell: null,
-    };
-  },
-  computed: {
-    ...mapGetters(['filteredAndGroupedSpells', 'selectedLevelOptions', 'selectedSchoolOptions', 'getSpellByIndex']),
-    filteredSpells() {
-      const spellsByLevel = this.filteredAndGroupedSpells;
-      const selectedLevels = this.selectedLevels;
-      const selectedSchools = this.selectedSchools;
+    name: 'SpellContainer',
+    components: {
+        MultiSelect,
+    },
+    data() {
+        return {
+            currentSpell: null,
+            selectedLevels: [],
+            selectedSchools: [],
+            levelOptions: [
+                { value: 0, label: 'Cantrips' },
+                { value: 1, label: 'Level 1' },
+                { value: 2, label: 'Level 2' },
+                { value: 3, label: 'Level 3' },
+                { value: 4, label: 'Level 4' },
+                { value: 5, label: 'Level 5' },
+                { value: 6, label: 'Level 6' },
+                { value: 7, label: 'Level 7' },
+                { value: 8, label: 'Level 8' },
+                { value: 9, label: 'Level 9' },
+            ],
+            schoolOptions: [
+                'Conjuration',
+                'Necromancy',
+                'Evocation',
+                'Abjuration',
+                'Transmutation',
+                'Divination',
+                'Enchantment',
+                'Illusion',
+            ],
+            showApplyButton: false,
+        };
+    },
+    created() {
+        this.fetchSpells();
+    },
+    computed: {
+        ...mapGetters(['spells']),
+        filteredSpells() {
+            const { spells } = this.$store.state;
+            const filteredSpells = [];
 
-      if (selectedLevels.length === 0 && selectedSchools.length === 0) {
-        return [];
-      }
+            for (const spell of spells) {
+                const { level, school } = spell;
 
-      let filteredSpells = [];
-
-      for (const level in spellsByLevel) {
-        if (selectedLevels.includes(level)) {
-          const spellsBySchool = spellsByLevel[level];
-
-          for (const school in spellsBySchool) {
-            if (selectedSchools.length === 0 || selectedSchools.includes(school)) {
-              filteredSpells = filteredSpells.concat(spellsBySchool[school]);
+                if (
+                    (this.selectedLevels.length === 0 || this.selectedLevels.includes(level)) &&
+                    (this.selectedSchools.length === 0 || this.selectedSchools.includes(school))
+                ) {
+                    filteredSpells.push(spell);
+                }
             }
-          }
-        }
-      }
 
-      return filteredSpells;
+            return filteredSpells;
+        },
     },
-  },
-  methods: {
-    ...mapActions(['fetchSpellsByLevelAndSchool', 'fetchSpellDetails']),
-    selectSpell(spellIndex) {
-      this.selectedSpell = this.getSpellByIndex(spellIndex);
-      if (this.selectedSpell) {
-        this.fetchSpellDetails(spellIndex);
-      }
+    methods: {
+        ...mapActions(['fetchSpellsByLevelAndSchool', 'fetchSpellDetails', 'fetchSpells']),
+        selectSpell(spellIndex) {
+            if (this.currentSpell && this.currentSpell.index === spellIndex) {
+                this.currentSpell = null;
+            } else {
+                this.$store.dispatch('fetchSpellDetails', spellIndex)
+                    .then((spellDetails) => {
+                        this.currentSpell = spellDetails;
+                    });
+            }
+        },
+        filterSpellsByLevel(level) {
+            return this.filteredSpells.filter((spell) => spell.level === level);
+        },
+        filterSpellsByLevelAndSchool(level, school) {
+            return this.filteredSpells.filter((spell) => spell.level === level && spell.school === school);
+        },
+        async applyFiltersAndShowButton() {
+            // Fetch spells for each selected level and school combination
+            for (const level of this.selectedLevels) {
+                for (const school of this.selectedSchools) {
+                    await this.fetchSpellsByLevelAndSchool({ level, school });
+                }
+            }
+            // Show the apply button if necessary
+            this.showApplyButton = true;
+        },
     },
-    applyFiltersAndShowButton() {
-      this.showApplyButton = true;
+    watch: {
+        selectedLevels() {
+            this.showApplyButton = false;
+        },
+        selectedSchools() {
+            this.showApplyButton = false;
+        },
     },
-  },
-  watch: {
-    selectedLevels() {
-      this.showApplyButton = false;
-    },
-    selectedSchools() {
-      this.showApplyButton = false;
-    },
-  },
 };
 </script>
   
