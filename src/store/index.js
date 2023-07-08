@@ -2,46 +2,33 @@ import { createStore } from 'vuex';
 import { fetchSpellDetails, fetchSpells } from '../api/api.js';
 
 export default createStore({
-  state() {
-    return {
-      spells: [],
-      filteredSpells: [],
-      spellLevels: [],
-      spellSchools: [],
-      spellDetails: null,
-    };
-  },
-  getters: {
-    filterSpells(state) {
-      return state.filteredSpells;
-    },
-    spellLevels(state) {
-      return state.spellLevels;
-    },
-    spellSchools(state) {
-      return state.spellSchools;
-    },
-    spellDetails(state) {
-      return state.spellDetails;
-    },
+  state: {
+    spells: [],
+    filteredSpells: [],
+    spellLevels: [],
+    spellSchools: [],
+    currentSpell: null,
   },
   mutations: {
     setSpells(state, spells) {
       state.spells = spells;
-      state.filteredSpells = spells;
     },
-    setSpellLevels(state, levels) {
-      state.spellLevels = levels;
+    setFilteredSpells(state, filteredSpells) {
+      state.filteredSpells = filteredSpells;
     },
-    setSpellSchools(state, schools) {
-      state.spellSchools = schools;
+    setSpellLevels(state, spellLevels) {
+      state.spellLevels = spellLevels;
     },
-    setFilteredSpells(state, spells) {
-      state.filteredSpells = spells;
+    setSpellSchools(state, spellSchools) {
+      state.spellSchools = spellSchools;
     },
     setSpellDetails(state, spellDetails) {
-      state.spellDetails = spellDetails;
+      state.currentSpell = spellDetails;
     },
+  },
+  getters: {
+    filteredSpells: state => state.filteredSpells,
+    spells: state => state.spells,
   },
   actions: {
     async fetchSpells({ commit }, filters = { levels: [], schools: [] }) {
@@ -54,8 +41,7 @@ export default createStore({
       } catch (error) {
         console.error('Error fetching spells:', error);
       }
-    },    
-
+    },
     async fetchSpellDetails({ commit }, spellIndex) {
       try {
         const spellDetails = await fetchSpellDetails(spellIndex);
@@ -66,7 +52,6 @@ export default createStore({
         throw error;
       }
     },
-
     async applyFilters({ commit, state }) {
       const selectedLevels = state.spellLevels ?? [];
       const selectedSchools = state.spellSchools ?? [];
