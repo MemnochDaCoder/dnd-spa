@@ -122,9 +122,8 @@
         <div v-else>
             <h2>All Spells</h2>
             <div class="list-group">
-                <button v-for="spell in filteredSpells" :key="spell.index"
-                    class="list-group-item list-group-item-action button" aria-current="true"
-                    @click="selectSpell(spell.index)">
+                <button v-for="spell in spells" :key="spell.index" class="list-group-item list-group-item-action button"
+                    aria-current="true" @click="selectSpell(spell.index)">
                     <div class="d-flex w-100 justify-content-between">
                         <h5 class="mb-1">{{ spell.name }}</h5>
                         <small v-if="spell.level !== undefined">Level: {{ spell.level }}</small>
@@ -172,120 +171,111 @@
         </div>
     </div>
 </template>
-    
+  
 <script>
-import { mapActions, mapGetters } from 'vuex';
-import '../styles/style.scss';
+import MultiSelect from 'vue-multiselect';
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
-    name: 'SpellContainer',
-    data() {
-        return {
-            currentSpell: null,
-            selectedLevels: [],
-            selectedSchools: [],
-            levelOptions: [
-                { value: 0, label: "Cantrips" },
-                { value: 1, label: "Level 1" },
-                { value: 2, label: "Level 2" },
-                { value: 3, label: "Level 3" },
-                { value: 4, label: "Level 4" },
-                { value: 5, label: "Level 5" },
-                { value: 6, label: "Level 6" },
-                { value: 7, label: "Level 7" },
-                { value: 8, label: "Level 8" },
-                { value: 9, label: "Level 9" },
-            ],
-            schoolOptions: [
-                'Conjuration',
-                'Necromancy',
-                'Evocation',
-                'Abjuration',
-                'Transmutation',
-                'Divination',
-                'Enchantment',
-                'Illusion',
-            ],
-            showApplyButton: false,
-        };
-    },
-    computed: {
-        ...mapGetters(['filteredSpells']),
-    },
-    mounted() {
-        this.fetchSpells();
-        this.showApplyButton = false;
-    },
-    methods: {
-        ...mapActions(['fetchSpells', 'fetchSpellDetails', 'applyFilters']),
-        applyFiltersAndShowButton() {
-            let levelValues = this.selectedLevels.map(level => level.value);
-            var s = this.selectedSchools;
-            this.fetchSpells({ levels: levelValues, schools: s });
-            this.showApplyButton = true;
-        },
-        selectSpell(index) {
-            if (this.currentSpell && this.currentSpell.index === index) {
-                this.currentSpell = null;
-            } else {
-                this.fetchSpellDetails(index)
-                    .then((spellDetails) => {
-                        this.currentSpell = spellDetails;
-                    })
-                    .catch((error) => {
-                        console.error('Error fetching spell details:', error);
-                    });
+  components: {
+    MultiSelect,
+  },
+  data() {
+    return {
+      selectedLevels: [],
+      selectedSchools: [],
+      showApplyButton: false,
+      selectedSpell: null,
+    };
+  },
+  computed: {
+    ...mapGetters(['filteredAndGroupedSpells', 'selectedLevelOptions', 'selectedSchoolOptions', 'getSpellByIndex']),
+    filteredSpells() {
+      const spellsByLevel = this.filteredAndGroupedSpells;
+      const selectedLevels = this.selectedLevels;
+      const selectedSchools = this.selectedSchools;
+
+      if (selectedLevels.length === 0 && selectedSchools.length === 0) {
+        return [];
+      }
+
+      let filteredSpells = [];
+
+      for (const level in spellsByLevel) {
+        if (selectedLevels.includes(level)) {
+          const spellsBySchool = spellsByLevel[level];
+
+          for (const school in spellsBySchool) {
+            if (selectedSchools.length === 0 || selectedSchools.includes(school)) {
+              filteredSpells = filteredSpells.concat(spellsBySchool[school]);
             }
-        },
-        filterSpellsByLevel(level) {
-            return this.filteredSpells
-                .filter(group => group.level === level)
-                .flatMap(group => group.spells);
-        },
-        filterSpellsByLevelAndSchool(level, school) {
-            return this.filteredSpells
-                .filter(group => group.level === level && group.school === school)
-                .flatMap(group => group.spells);
-        },
+          }
+        }
+      }
+
+      return filteredSpells;
     },
+  },
+  methods: {
+    ...mapActions(['fetchSpellsByLevelAndSchool', 'fetchSpellDetails']),
+    selectSpell(spellIndex) {
+      this.selectedSpell = this.getSpellByIndex(spellIndex);
+      if (this.selectedSpell) {
+        this.fetchSpellDetails(spellIndex);
+      }
+    },
+    applyFiltersAndShowButton() {
+      this.showApplyButton = true;
+    },
+  },
+  watch: {
+    selectedLevels() {
+      this.showApplyButton = false;
+    },
+    selectedSchools() {
+      this.showApplyButton = false;
+    },
+  },
 };
 </script>
-    
+  
 <style scoped>
-.spells {
-    margin-bottom: 20px;
-}
-
-ul {
-    list-style: none;
-    padding: 0;
+.spell-container {
+    padding: 20px;
 }
 
 .filters {
     margin-bottom: 20px;
-    margin-top: 20px;
-    margin-left: 20px;
-    margin-right: 20px;
 }
 
 .filter-row {
     display: flex;
-    justify-content: center;
     align-items: center;
 }
 
 .filter-row>div {
-    margin: 0 10px;
+    margin: 5px;
 }
 
-.filter-row>select {
-    margin: 10px;
+.button {
+    width: 100%;
+    text-align: left;
+}
+
+.table {
+    margin-top: 10px;
 }
 
 .spellheader {
     font-weight: bold;
 }
+
+.small {
+    font-size: 12px;
+}
 </style>
+  
+
 <!-- <template>
     <div class="spell-container">
         <div class="filters">
@@ -299,7 +289,9 @@ ul {
                         placeholder="Select a school." :close-on-select="false" />
                 </div>
                 <div>
-                    <button class="btn btn-outline-primary" type="button" @click="applyFiltersAndShowButton">Apply</button>
+                    <button class="btn btn-outline-primary" type="button" @click="applyFiltersAndShowButton">
+                        Apply
+                    </button>
                 </div>
             </div>
         </div>
@@ -345,8 +337,7 @@ ul {
                                                 <td class="spellheader">Description</td>
                                                 <td>
                                                     <ul>
-                                                        <li v-for="desc in currentSpell.desc" :key="desc">{{ desc }}
-                                                        </li>
+                                                        <li v-for="desc in currentSpell.desc" :key="desc">{{ desc }}</li>
                                                     </ul>
                                                 </td>
                                             </tr>
@@ -409,9 +400,8 @@ ul {
         <div v-else>
             <h2>All Spells</h2>
             <div class="list-group">
-                <button v-for="spell in filterSpells" :key="spell.index"
-                    class="list-group-item list-group-item-action button" aria-current="true"
-                    @click="selectSpell(spell.index)">
+                <button v-for="spell in spells" :key="spell.index" class="list-group-item list-group-item-action button"
+                    aria-current="true" @click="selectSpell(spell.index)">
                     <div class="d-flex w-100 justify-content-between">
                         <h5 class="mb-1">{{ spell.name }}</h5>
                         <small v-if="spell.level !== undefined">Level: {{ spell.level }}</small>
@@ -459,7 +449,7 @@ ul {
         </div>
     </div>
 </template>
-  
+    
 <script>
 import { mapActions, mapGetters } from 'vuex';
 import '../styles/style.scss';
@@ -497,7 +487,16 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(['filterSpells']),
+        ...mapGetters(['filteredSpells', 'spells']),
+        selectedLevels() {
+            return this.$store.getters.selectedLevelOptions;
+        },
+        selectedSchools() {
+            return this.$store.getters.selectedSchoolOptions;
+        },
+        filteredAndGroupedSpells() {
+            return this.$store.getters.filteredAndGroupedSpells;
+        },
     },
     mounted() {
         this.fetchSpells();
@@ -505,39 +504,30 @@ export default {
     },
     methods: {
         ...mapActions(['fetchSpells', 'fetchSpellDetails', 'applyFilters']),
-        applyFiltersAndShowButton() {
-            let levelValues = this.selectedLevels.map(level => level.value);
-            var s = this.selectedSchools;
-            this.fetchSpells({ levels: levelValues, schools: s });
-            this.showApplyButton = true;
-        },
-        selectSpell(index) {
-            if (this.currentSpell && this.currentSpell.index === index) {
-                this.currentSpell = null;
-            } else {
-                this.fetchSpellDetails(index)
-                    .then((spellDetails) => {
-                        this.currentSpell = spellDetails;
-                    })
-                    .catch((error) => {
-                        console.error('Error fetching spell details:', error);
-                    });
+        async applyFiltersAndShowButton() {
+            // Fetch spells for each selected level and school combination
+            for (const level of this.selectedLevels) {
+                for (const school of this.selectedSchools) {
+                    await this.fetchSpellsByLevelAndSchool({ level, school });
+                }
             }
-        },
-        filterSpellsByLevel(level) {
-            return this.filterSpells
-                .filter(group => group.level === level)
-                .flatMap(group => group.spells);
-        },
-        filterSpellsByLevelAndSchool(level, school) {
-            return this.filterSpells
-                .filter(group => group.level === level && group.school === school)
-                .flatMap(group => group.spells);
-        },
-    }
+            // Show the apply button if necessary
+            this.showApplyButton = true;
+        }
+    },
+    filterSpellsByLevel(level) {
+        return this.filteredSpells
+            .filter(group => group.level === level)
+            .flatMap(group => group.spells);
+    },
+    filterSpellsByLevelAndSchool(level, school) {
+        return this.filteredSpells
+            .filter(group => group.level === level && group.school === school)
+            .flatMap(group => group.spells);
+    },
 };
 </script>
-  
+    
 <style scoped>
 .spells {
     margin-bottom: 20px;
