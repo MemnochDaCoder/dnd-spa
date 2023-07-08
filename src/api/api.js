@@ -1,5 +1,4 @@
 export async function fetchSpells({ levels = [], schools = [] }) {
-  // Fetch all spells without filtering if there are no filters
   if (levels.length === 0 && schools.length === 0) {
     const response = await fetch('https://www.dnd5eapi.co/api/spells');
     const data = await response.json();
