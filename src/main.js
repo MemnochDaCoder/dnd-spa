@@ -6,12 +6,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import MultiSelect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.css';
-import 'vue-multiselect/dist/vue-multiselect.common.js';
 
 const app = createApp(App);
 app.use(router);
 app.use(store);
-
 app.component('MultiSelect', MultiSelect);
 
 app.mount('#app');

@@ -1,103 +1,69 @@
-import { fetchSpells, fetchSpellsByLevelAndSchool, fetchSpellDetails } from '../api/api.js';
+import { createStore } from 'vuex';
+import { fetchSpells, fetchSpellDetails } from '../api/api.js';
 
-export const state = {
-  spells: [],
-  selectedLevels: [],
-  selectedSchools: [],
-  selectedSpell: null,
-};
-
-export const mutations = {
-  SET_SPELLS(state, spells) {
-    state.spells = spells;
+export default createStore({
+  state: {
+    spells: [],
+    selectedLevels: [],
+    selectedSchools: [],
+    spellDetails: {},
+    currentSpellIndex: null,
+    filteredSpells: [],
   },
-  SET_SELECTED_LEVELS(state, levels) {
-    state.selectedLevels = levels;
+  mutations: {
+    SET_SPELLS(state, spells) {
+      state.spells = spells;
+      state.filteredSpells = spells;
+    },
+    SET_SELECTED_LEVELS(state, levels) {
+      state.selectedLevels = levels;
+    },
+    SET_SELECTED_SCHOOLS(state, schools) {
+      state.selectedSchools = schools;
+    },
+    SET_SPELL_DETAILS(state, spell) {
+      state.spellDetails = spell;
+    },
+    SET_CURRENT_SPELL_INDEX(state, index) {
+      state.currentSpellIndex = index;
+    },
+    SET_FILTERED_SPELLS(state, filteredSpells) {
+      state.filteredSpells = filteredSpells;
+    },
   },
-  SET_SELECTED_SCHOOLS(state, schools) {
-    state.selectedSchools = schools;
-  },
-  SET_SPELL_DETAILS(state, details) {
-    state.spellDetails = details;
-  },
-};
-
-export const actions = {
-  async fetchSpells({ commit, state }) {
-    const { selectedLevels, selectedSchools } = state;
-    if (selectedLevels.length === 0 && selectedSchools.length === 0) {
-      const spells = await fetchSpells({});
+  actions: {
+    async fetchSpells({ commit, state }) {
+      const { selectedLevels, selectedSchools } = state;
+      const spells = await fetchSpells(selectedLevels, selectedSchools);
       commit('SET_SPELLS', spells);
-    } else {
-      const promises = [];
-      for (const level of selectedLevels) {
-        for (const school of selectedSchools) {
-          promises.push(fetchSpellsByLevelAndSchool(level, school));
-        }
+    },
+    async fetchSpellDetails({ commit }, spellIndex) {
+      if (spellIndex !== null) {
+        const spellDetails = await fetchSpellDetails(spellIndex);
+        commit('SET_SPELL_DETAILS', spellDetails);
+        commit('SET_CURRENT_SPELL_INDEX', spellIndex);
+      } else {
+        commit('SET_SPELL_DETAILS', null);
+        commit('SET_CURRENT_SPELL_INDEX', null);
       }
-      const groupedSpells = await Promise.all(promises);
-      commit('SET_SPELLS', groupedSpells.flat());
-    }
+    },
+    async applyFilters({ commit }, filters) {
+      const { levels, schools } = filters;
+      commit('SET_SELECTED_LEVELS', levels);
+      commit('SET_SELECTED_SCHOOLS', schools);
+      const spells = await fetchSpells(levels.map((level) => level.value), schools);
+      commit('SET_FILTERED_SPELLS', spells);
+    },
+    clearFilters({ commit }) {
+      commit('SET_SELECTED_LEVELS', []);
+      commit('SET_SELECTED_SCHOOLS', []);
+      commit('SET_FILTERED_SPELLS', []);
+    },
   },
-  async fetchSpellsByLevelAndSchool({ commit }, { level, school }) {
-    const spells = await fetchSpellsByLevelAndSchool(level, school);
-    commit('SET_SPELLS', spells);
+  getters: {
+    spells: (state) => state.spells,
+    spellDetails: (state) => state.spellDetails,
+    currentSpellIndex: (state) => state.currentSpellIndex,
+    filteredSpells: (state) => state.filteredSpells,
   },
-  async fetchSpellDetails({ commit }, spellIndex) {
-    const spellDetails = await fetchSpellDetails(spellIndex);
-    commit('SET_SPELL_DETAILS', spellDetails);
-    return spellDetails;
-  },
-  setSelectedLevels({ commit }, levels) {
-    commit('SET_SELECTED_LEVELS', levels);
-  },
-  setSelectedSchools({ commit }, schools) {
-    commit('SET_SELECTED_SCHOOLS', schools);
-  },
-};
-
-export const getters = {
-  filteredAndGroupedSpells(state) {
-    const spellsByLevel = {};
-    const { spells } = state;
-
-    for (const spell of spells) {
-      const { level, school } = spell;
-      if (!spellsByLevel[level]) {
-        spellsByLevel[level] = {};
-      }
-      if (!spellsByLevel[level][school]) {
-        spellsByLevel[level][school] = [];
-      }
-      spellsByLevel[level][school].push(spell);
-    }
-
-    return spellsByLevel;
-  },
-  selectedLevelOptions(state) {
-    const { spells, selectedLevels } = state;
-    const levelOptions = [];
-
-    for (const spell of spells) {
-      const { level } = spell;
-      if (!levelOptions.includes(level) && selectedLevels.includes(level)) {
-        levelOptions.push(level);
-      }
-    }
-
-    return levelOptions;
-  },
-  selectedSchoolOptions(state) {
-    const { spells, selectedSchools } = state;
-    const schoolOptions = [];
-
-    for (const spell of spells) {
-      const { school } = spell;
-      if (!schoolOptions.includes(school) && selectedSchools.includes(school)) {
-        schoolOptions.push(school);
-      }
-    }
-
-    return schoolOptions;
-  },
-};
+});
