@@ -77,3 +77,33 @@ export async function fetchSpellDetails(spellIndex) {
   const data = await response.json();
   return data;
 }
+
+export async function fetchClasses() {
+  const response = await fetch('https://www.dnd5eapi.co/api/classes');
+  const data = await response.json();
+  return data.results;
+}
+
+export async function fetchClassDetails(classIndex) {
+  const response = await fetch(`https://www.dnd5eapi.co/api/classes/${classIndex}`);
+  const data = await response.json();
+  return data;
+}
+
+export async function fetchClassSpells(classIndex) {
+  const response = await fetch(`https://www.dnd5eapi.co/api/classes/${classIndex}/spells`);
+  const data = await response.json();
+  return data;
+}
+
+export async function fetchSkillDetails(skillIndex){
+  const response = await fetch(`https://www.dnd5eapi.co/api/skills/${skillIndex}`);
+  const data = await response.json();
+  return data;
+}
+
+export async function fetchDetails(url){
+  const response = await fetch(`https://www.dnd5eapi.co${url}`);
+  const data = await response.json();
+  return data;
+}
