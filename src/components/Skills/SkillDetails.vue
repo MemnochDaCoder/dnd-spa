@@ -1,23 +1,20 @@
 <template>
     <div>
-        <div v-if="skillDetails" class="mt-4">
-            <h4>{{ skillDetails.name }}</h4>
-            <p v-for="sd in skillDetails.desc" :key="sd">{{ sd }}</p>
-            <button class="btn btn-info" v-if="skillDetails.ability_score"
-                @click="getAbilityScoreDetail(skillDetails.ability_score.url, 'ability', skillDetails.ability_score.index)">
-                Name: {{ skillDetails.ability_score.name }}
-            </button>
-            <AbilityScoreDetail
-                v-if="abilityScoreDetails && abilityScoreDetails.index === skillDetails.ability_score.index"
-                :abilityScoreInfo="abilityScoreDetails" />
-
+        <div v-if="resolvedSkillDetails" class="mt-4">
+            <h4>{{ resolvedSkillDetails.name }}</h4>
+            <p v-for="desc in resolvedSkillDetails.desc" :key="desc">{{ desc }}</p>
+            <div v-if="resolvedSkillDetails.ability_score">
+                <AbilityScoreDetail
+                    v-if="abilityScoreDetails && abilityScoreDetails.index === resolvedSkillDetails.ability_score.index"
+                    :asd="abilityScoreDetails" />
+            </div>
         </div>
     </div>
 </template>
-
+  
 <script>
-import { mapGetters, mapActions } from 'vuex';
 import AbilityScoreDetail from './AbilityScoreDetail.vue';
+import { mapGetters } from 'vuex';
 
 export default {
     props: {
@@ -31,17 +28,13 @@ export default {
     },
     computed: {
         ...mapGetters(['abilityScoreDetails']),
-    },
-    methods: {
-        ...mapActions(['fetchDetails']),
-        async getAbilityScoreDetail(url, type) {
-            await this.fetchDetails(url, type);
-        }
-    },
-    mounted() {
-        if (this.skillDetails && this.skillDetails.ability_score && this.skillDetails.ability_score.url) {
-            this.$store.dispatch('fetchDetails', { url: this.skillDetails.ability_score.url, type: 'ability' });
-        }
+        resolvedSkillDetails() {
+            if (this.skillDetails instanceof Promise) {
+                return null;
+            } else {
+                return this.skillDetails;
+            }
+        },
     },
 };
 </script>

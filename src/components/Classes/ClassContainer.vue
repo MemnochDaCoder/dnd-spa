@@ -67,8 +67,8 @@ export default {
 
             if (dndClass[showProperty]) {
                 if (!dndClass.responseData || !dndClass.responseData[type]) {
-                    const classIndex = dndClass.index; // Ensure classIndex is defined
-                    if (classIndex !== undefined) { // Add a check for classIndex
+                    const classIndex = dndClass.index;
+                    if (classIndex !== undefined) {
                         this.$store.dispatch(fetchAction, classIndex);
                     }
                 }
@@ -76,8 +76,6 @@ export default {
                 type === 'spells' ? (dndClass.showSpells = !dndClass.showSpells) : (dndClass.showSpells = false);
             } else {
                 dndClass.responseData = { ...dndClass.responseData, [type]: null };
-                this.classDetails = null;
-                this.classSpells = null;
             }
         },
         fetchData(dndClass, type) {

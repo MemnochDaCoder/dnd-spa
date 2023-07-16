@@ -5,7 +5,7 @@
             <h5>Classes:</h5>
             <ul>
                 <li v-for="classItem in proficiencyDetail.classes" :key="classItem.index">
-                    <a :href="classItem.url">{{ classItem.name }}</a>
+                    {{ classItem.name }}
                 </li>
             </ul>
         </div>
@@ -17,44 +17,66 @@
                 </li>
             </ul>
         </div>
-        <div v-if="proficiencyDetail.reference">
-            <h5>Reference:</h5>
-            <button class="btn btn-info" type="button" v-if="proficiencyDetail.type === 'Skill'"
-                @click="getSkillDetail(proficiencyDetail.reference.url, 'skill', proficiencyDetail.reference.index)">
-                Name: {{ proficiencyDetail.reference.name }} - Skill
-            </button>
-            <button class="btn btn-info" type="button" v-else
-                @click="getEquipmentDetail(proficiencyDetail.reference.url, 'equipment', proficiencyDetail.reference.index)">
-                Name: {{ proficiencyDetail.reference.name }} - Equipment
-            </button>
+        <div v-if="proficiencyDetail.index && proficiencyDetail.index.includes('skill')">
+            <SkillDetail v-if="proficiencyDetail.index && proficiencyDetail.index.includes('skill')"
+                :skillDetails="getDetail(proficiencyDetail.index, 'skill')" />
         </div>
-        <div v-if="equipmentDetails && equipmentDetails.index === proficiencyDetail.reference.index">
-            <EquipmentDetails :equipmentDetails="equipmentDetails" />
+        <div v-else-if="proficiencyDetail.index && (proficiencyDetail.index.includes('str') || proficiencyDetail.index.includes('con')
+            || proficiencyDetail.index.includes('dex') || proficiencyDetail.index.includes('wis')
+            || proficiencyDetail.index.includes('int') || proficiencyDetail.index.includes('cha'))">
+            <AbilityScoreDetail :asd="getDetail(proficiencyDetail.index, proficiencyDetail.type)" />
         </div>
-        <div v-if="skillDetails && selectedSkill.index === proficiencyDetail.reference.index && selectedSkill.show">
-            <SkillDetails :skillDetails="skillDetails" />
+        <div v-else-if="proficiencyDetail.index && (proficiencyDetail.index.includes('bagpipes') || proficiencyDetail.index.includes('drum')
+            || proficiencyDetail.index.includes('dulcimer') || proficiencyDetail.index.includes('flute') || proficiencyDetail.index.includes('lute')
+            || proficiencyDetail.index.includes('lyre') || proficiencyDetail.index.includes('horn')
+            || proficiencyDetail.index.includes('shawm') || proficiencyDetail.index.includes('viol'))">
+            <InstrumentDetail :instrumentDetails="getDetail(proficiencyDetail.index, proficiencyDetail.type)" />
+        </div>
+        <div v-else-if="proficiencyDetail.index && proficiencyDetail.index.includes('tools')">
+            <ArtisanTools :tool="getDetail(proficiencyDetail.index, proficiencyDetail.type)" />
+        </div>
+        <div
+            v-else-if="proficiencyDetail.index && (proficiencyDetail.index.includes('armor') || proficiencyDetail.index.includes('weapons'))">
+            <EquipmentDetail :equipmentDetails="getDetail(proficiencyDetail.index, proficiencyDetail.type)" />
         </div>
     </div>
 </template>
   
 <script>
-import SkillDetails from "../Skills/SkillDetails.vue";
-import EquipmentDetails from "../Equipment/EquipmentDetail.vue";
-import { mapGetters, mapActions } from "vuex";
+import { mapGetters, mapActions } from 'vuex';
+import SkillDetail from '../Skills/SkillDetails.vue';
+import AbilityScoreDetail from '../Skills/AbilityScoreDetail.vue';
+import InstrumentDetail from '../Equipment/InstrumentDetail.vue';
+import ArtisanTools from '../Equipment/ArtisanTools.vue';
+import EquipmentDetail from '../Equipment/EquipmentDetail.vue';
 
 export default {
-    data() {
-        return {
-            selectedSkill: { index: null, show: false },
-            selectedEquipment: {index: null, show: false},
-        };
+    computed: {
+        ...mapGetters(['proficiencyDetails']),
     },
     components: {
-        SkillDetails,
-        EquipmentDetails,
+        SkillDetail,
+        AbilityScoreDetail,
+        InstrumentDetail,
+        ArtisanTools,
+        EquipmentDetail,
     },
-    computed: {
-        ...mapGetters(['skillDetails', 'equipmentDetails']),
+    methods: {
+        ...mapActions(['fetchDetailsByUrl', 'fetchDetailsByIndex']),
+        async getDetail(index, type) {
+            try {
+                let data = await this.fetchDetailsByIndex({ index, type });
+                return data;
+            }
+            catch (error) {
+                console.log(error);
+            }
+
+        },
+        async getDetailByUrl(url, type) {
+            let data = await this.fetchDetailsByUrl({ url, type });
+            return data;
+        },
     },
     props: {
         proficiencyDetail: {
@@ -62,16 +84,11 @@ export default {
             required: true,
         },
     },
-    methods: {
-        ...mapActions(["fetchDetails"]),
-        async getSkillDetail(url, type, index) {
-            this.selectedSkill = {index: index, show: true};
-            await this.fetchDetails({ url, type });
-        },
-        async getEquipmentDetail(url, type, index) {
-            this.selectedEquipment = {index: index, show: true};
-            await this.$store.dispatch('fetchDetails', { url, type });
-        },
+    mounted() {
+        this.$store.dispatch('fetchDetailsByUrl', {
+            url: this.proficiencyDetail.url,
+            type: 'proficiency',
+        });
     },
 };
 </script>

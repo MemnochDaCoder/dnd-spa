@@ -1,11 +1,11 @@
 <template>
-  <div>
-    <h4>{{ abilityScoreInfo.name }} ({{ abilityScoreInfo.full_name }})</h4>
-    <p v-for="description in abilityScoreInfo.desc" :key="description">{{ description }}</p>
-    <h5>Skills:</h5>
+  <div v-if="asd">
+    <h4>{{ asd.full_name }}</h4>
+    <p><strong>Abbreviation:</strong> {{ asd.index }}</p>
+    <p><strong>Skills:</strong></p>
     <ul>
-      <li v-for="skill in abilityScoreInfo.skills" :key="skill.index">
-        <p>{{ skill.name }}</p>
+      <li v-for="skill in asd.skills" :key="skill.index">
+        <a :href="skill.url">{{ skill.name }}</a>
       </li>
     </ul>
   </div>
@@ -15,14 +15,14 @@
 import { mapGetters } from 'vuex';
 
 export default {
-  computed: {
-    ...mapGetters(['abilityScoreDetails']),
-  },
   props: {
-    abilityScoreInfo: {
+    asd: {
       type: Object,
       required: true,
     },
   },
+  computed: {
+    ...mapGetters['abilityScoreDetails'],
+  }
 };
 </script>

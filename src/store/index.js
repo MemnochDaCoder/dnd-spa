@@ -1,5 +1,5 @@
 import { createStore } from 'vuex';
-import { fetchSpells, fetchSpellDetails, fetchClasses, fetchClassDetails, fetchClassSpells, fetchDetails } from '../api/api.js';
+import { fetchSpells, fetchSpellDetails, fetchClasses, fetchClassDetails, fetchClassSpells, fetchDetails, fetchEquipmentDetails, fetchAbilityScoreDetails, fetchSkillDetails } from '../api/api.js';
 
 export default createStore({
   state: {
@@ -15,8 +15,10 @@ export default createStore({
     classSpells: [],
     skillDetails: {},
     abilityScoreDetails: {},
-    equipmentDetails: {},
+    instrumentDetails: {},
     proficiencyDetails: {},
+    toolDetails: {},
+    equipmentDetails: {},
   },
   mutations: {
     SET_CLASSES(state, classes) {
@@ -60,11 +62,17 @@ export default createStore({
     SET_ABILITY_SCORE_DETAILS(state, scoreInfo) {
       state.abilityScoreDetails = scoreInfo;
     },
-    SET_EQUIPMENT_DETAILS(state, details) {
-      state.equipmentDetails = details;
+    SET_INSTRUMENT_DETAILS(state, details) {
+      state.instrumentDetails = details;
     },
     SET_PROFICIENCY_DETAILS(state, details) {
       state.proficiencyDetails = details;
+    },
+    SET_TOOL_DETAILS(state, details) {
+      state.toolDetails = details;
+    },
+    SET_EQUIPMENT_DETAILS(state, details) {
+      state.equipmentDetails = details;
     },
   },
   actions: {
@@ -139,7 +147,7 @@ export default createStore({
       commit('SET_SELECTED_SCHOOLS', []);
       commit('SET_FILTERED_SPELLS', []);
     },
-    async fetchDetails({ commit }, { url, type }) {
+    async fetchDetailsByUrl({ commit }, { url, type }) {
       try {
         const details = await fetchDetails(url);
         switch (type) {
@@ -152,8 +160,37 @@ export default createStore({
           case 'proficiency':
             commit('SET_PROFICIENCY_DETAILS', details);
             break;
-          case 'equipment':
-            commit('SET_EQUIPMENT_DETAILS', details);
+          case 'instrument':
+            commit('SET_INSTRUMENT_DETAILS', details);
+            break;
+          default:
+            break;
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async fetchDetailsByIndex({ commit }, { index, type }) {
+      try {
+        let detail = {};
+        let newIndex = index.includes('skill-') ? index.replace('skill-', '') : index;
+        //console.log(`index.js index in fetchDetailsByIndex: ${newIndex}, type: ${type}`);
+        switch (type) {
+          case 'ability':
+            detail = await fetchAbilityScoreDetails(newIndex);
+            commit('SET_ABILITY_SCORE_DETAILS', detail);
+            break;
+          case 'skill':
+            detail = await fetchSkillDetails(newIndex);
+            commit('SET_SKILL_DETAILS', detail);
+            break;
+          case 'instrument':
+            detail = await fetchEquipmentDetails(newIndex);
+            commit('SET_INSTRUMENT_DETAILS', detail);
+            break;
+          case 'tool':
+            detail = await fetchEquipmentDetails(newIndex);
+            commit('SET_TOOL_DETAILS', detail);
             break;
           default:
             break;
@@ -178,7 +215,7 @@ export default createStore({
     filteredSpells: (state) => state.filteredSpells,
     skillDetails: (state) => state.skillDetails,
     abilityScoreDetails: (state) => state.abilityScoreDetails,
-    equipmentDetails: (state) => state.equipmentDetails,
+    instrumentDetails: (state) => state.instrumentDetails,
     proficiencyDetails: (state) => state.proficiencyDetails,
   },
 });

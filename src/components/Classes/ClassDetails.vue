@@ -14,11 +14,13 @@
                                 <strong>{{ choice.desc }}</strong>
                                 <div v-if="choice.from.options">
                                     <div class="card" v-for="option in choice.from.options" :key="option.item.index"
-                                        type="button" @click="getDetail(option.item.url, 'proficiency', option.item.index)">
+                                        type="button" @click="getProficiencyDetail(option.item.url, option.item.index)">
                                         <div class="card-body">
                                             <p class="card-title btn">{{ option.item.name }}</p>
-                                            <div v-if="proficiencyDetails && this.selectedProficiency.index === option.item.index && this.selectedProficiency.showDetails"
-                                                class="card-body">
+                                            <div v-if="proficiencyDetails &&
+                                                this.selectedProficiency.index === option.item.index &&
+                                                this.selectedProficiency.showDetails
+                                                " class="card-body">
                                                 <ProficiencyDetail :proficiencyDetail="proficiencyDetails" />
                                             </div>
                                         </div>
@@ -33,10 +35,13 @@
                     <td>
                         <ul>
                             <li v-for="proficiency in classDetails.proficiencies" :key="proficiency.index">
-                                <button class="btn" @click="getDetail(proficiency.url, 'proficiency', proficiency.index)">{{
-                                    proficiency.name }}</button>
-                                <div
-                                    v-if="proficiencyDetails && showProficiencyDetails && this.selectedProficiency === proficiency.index">
+                                <button class="btn" @click="getProficiencyDetail(proficiency.url, proficiency.index)">
+                                    {{ proficiency.name }}
+                                </button>
+                                <div v-if="proficiencyDetails &&
+                                    showProficiencyDetails &&
+                                    this.selectedProficiency === proficiency.index
+                                    ">
                                     <ProficiencyDetail :proficiencyDetail="proficiencyDetails" />
                                 </div>
                             </li>
@@ -167,15 +172,27 @@ export default {
         ...mapGetters(['classDetails', 'proficiencyDetails']),
     },
     methods: {
-        ...mapActions(['fetchDetails']),
-        async getDetail(url, type, index) {
+        ...mapActions(['fetchDetailsByUrl']),
+        async getProficiencyDetail(url, index) {
             this.selectedProficiency = {};
             this.showProficiencyDetails = false;
 
-            await this.$store.dispatch('fetchDetails', { url, type });
+            await this.$store.dispatch('fetchDetailsByUrl', { url, type: 'proficiency' });
 
             this.selectedProficiency = { index: index, showDetails: true };
-        }
+
+            const proficiency = this.proficiencyDetails[index];
+            if (proficiency && proficiency.ability_score) {
+                await this.$store.dispatch('fetchDetailsByUrl', { url: proficiency.ability_score.url, type: 'ability' });
+            }
+            if (this.proficiencyDetails && this.proficiencyDetails.Type && this.proficiencyDetails.Type.search("Skill")) {
+                console.log(this.proficiencyDetails.url);
+                await this.$store.dispatch('fetchDetailsByUrl', { url: this.proficiencyDetails.url, type: 'skill' });
+            }
+            if (this.proficiencyDetails && this.proficiencyDetails.Type && this.proficiencyDetails.type.search("Instruments")) {
+                await this.$store.dispatch('fetchDetailsByUrl', { url: this.proficiencyDetails.url, type: 'instrument' });
+            }
+        },
     },
 };
 </script>

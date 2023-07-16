@@ -96,8 +96,20 @@ export async function fetchClassSpells(classIndex) {
   return data;
 }
 
-export async function fetchSkillDetails(skillIndex){
-  const response = await fetch(`https://www.dnd5eapi.co/api/skills/${skillIndex}`);
+export async function fetchSkillDetails(index){
+  const response = await fetch(`https://www.dnd5eapi.co/api/skills/${index}`);
+  const data = await response.json();
+  return data;
+}
+
+export async function fetchEquipmentDetails(index){
+  const response = await fetch(`https://www.dnd5eapi.co/equipment/${index}`);
+  const data = await response.json();
+  return data;
+}
+
+export async function fetchAbilityScoreDetails(index){
+  const response = await fetch(`https://www.dnd5eapi.co/ability-scores/${index}`);
   const data = await response.json();
   return data;
 }
