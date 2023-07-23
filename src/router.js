@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import SpellContainer from './components/SpellContainer.vue';
-import AllSpells from './components/AllSpells.vue';
-import FilteredSpells from './components/FilteredSpells.vue';
-import SpellFilters from './components/SpellFilters.vue';
+import SpellContainer from './components/Spells/SpellContainer.vue';
+import AllSpells from './components/Spells/AllSpells.vue';
+import FilteredSpells from './components/Spells/FilteredSpells.vue';
+import SpellFilters from './components/Spells/SpellFilters.vue';
 
 const routes = [
   { path: '/', name: 'Home', component: SpellContainer },

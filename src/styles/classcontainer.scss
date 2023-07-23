@@ -1,0 +1,128 @@
+.btn {
+    color: black;
+}
+
+.btn:hover {
+    color: white;
+}
+
+.btn.btn-outline-danger {
+    color: black;
+    border-color: red;
+}
+
+.btn.btn-outline-danger:hover {
+    background-color: red;
+}
+
+.btn.btn-outline-magenta {
+    color: black;
+    border-color: magenta;
+}
+
+.btn.btn-outline-magenta:hover {
+    background-color: magenta;
+}
+
+.btn.btn-outline-light {
+    color: black;
+    border-color: white;
+    background-color: #343a40;
+    /* dark interior */
+}
+
+.btn.btn-outline-light:hover {
+    background-color: white;
+    color: black;
+}
+
+.btn.btn-outline-warning {
+    color: black;
+    border-color: orange;
+}
+
+.btn.btn-outline-warning:hover {
+    background-color: orange;
+}
+
+.btn.btn-outline-brown {
+    color: black;
+    border-color: brown;
+}
+
+.btn.btn-outline-brown:hover {
+    background-color: brown;
+}
+
+.btn.btn-outline-jade {
+    color: black;
+    border-color: #00A86B;
+}
+
+.btn.btn-outline-jade:hover {
+    background-color: #00A86B;
+}
+
+.btn.btn-outline-pink {
+    color: black;
+    border-color: pink;
+}
+
+.btn.btn-outline-pink:hover {
+    background-color: pink;
+}
+
+.btn.btn-outline-success {
+    color: black;
+    border-color: green;
+}
+
+.btn.btn-outline-success:hover {
+    background-color: green;
+}
+
+.btn.btn-outline-yellow {
+    color: black;
+    border-color: yellow;
+}
+
+.btn.btn-outline-yellow:hover {
+    background-color: yellow;
+}
+
+.btn.btn-outline-primary {
+    color: black;
+    border-color: blue;
+}
+
+.btn.btn-outline-primary:hover {
+    background-color: blue;
+}
+
+.btn.btn-outline-purple {
+    color: black;
+    border-color: purple;
+}
+
+.btn.btn-outline-purple:hover {
+    background-color: purple;
+}
+
+.btn.btn-outline-info {
+    color: black;
+    border-color: lightblue;
+}
+
+.btn.btn-outline-info:hover {
+    background-color: lightblue;
+}
+
+.btn.btn-outline-light {
+    background-color: #343a40;
+    color: white;
+}
+
+.btn.btn-outline-light:hover {
+    background-color: white;
+    color: black;
+}
