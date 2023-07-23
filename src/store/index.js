@@ -19,6 +19,15 @@ export default createStore({
     proficiencyDetails: {},
     toolDetails: {},
     equipmentDetails: {},
+    equipmentCategory: {},
+    weaponDetails: {},
+    weaponProperties: {},
+    subclassDetails: {},
+    subclassLevels: [],
+    subclassFeatures: [],
+    feature: {},
+    equipmentList: {},
+    damageTypeDetails: {},
   },
   mutations: {
     SET_CLASSES(state, classes) {
@@ -74,6 +83,30 @@ export default createStore({
     SET_EQUIPMENT_DETAILS(state, details) {
       state.equipmentDetails = details;
     },
+    SET_EQUIPMENT_CATEGORY(state, details) {
+      state.equipmentCategory = details;
+    },
+    SET_WEAPON_DETAILS(state, details) {
+      state.weaponDetails = details;
+    },
+    SET_WEAPON_PROPERTIES(state, details) {
+      state.weaponProperties = details;
+    },
+    SET_SUBCLASS_DETAILS(state, details) {
+      state.subclassDetails = details;
+    },
+    SET_SUBCLASS_LEVEL_DETAILS(state, details) {
+      state.subclassLevels = details;
+    },
+    SET_SUBCLASS_FEATURE(state, details) {
+      state.feature = details;
+    },
+    SET_EQUIPMENT_LIST(state, details) {
+      state.equipmentList = details;
+    },
+    SET_DAMAGE_TYPE_DETAILS(state, details) {
+      state.damageTypeDetails = details;
+    },
   },
   actions: {
     async fetchClasses({ commit }) {
@@ -85,7 +118,6 @@ export default createStore({
       }
     },
     async fetchClassDetails({ commit }, classIndex) {
-      if (classIndex === undefined) throw new Error(`The class index (${classIndex}) was undefined, what the fuck dude?`);
       try {
         const details = await fetchClassDetails(classIndex);
         commit('SET_CLASS_DETAILS', { details });
@@ -147,6 +179,10 @@ export default createStore({
       commit('SET_SELECTED_SCHOOLS', []);
       commit('SET_FILTERED_SPELLS', []);
     },
+    async fetchDetails(url) {
+      if (typeof url === 'object') throw new Error(`URL: ${url}`);
+      return await fetchDetails(url.toString());
+    },
     async fetchDetailsByUrl({ commit }, { url, type }) {
       try {
         const details = await fetchDetails(url);
@@ -163,6 +199,33 @@ export default createStore({
           case 'instrument':
             commit('SET_INSTRUMENT_DETAILS', details);
             break;
+          case 'equipment':
+            commit('SET_EQUIPMENT_DETAILS', details);
+            return details;
+          case 'equipment_category':
+            commit("SET_EQUIPMENT_CATEGORY", details);
+            return details;
+          case 'weapon':
+            commit("SET_WEAPON_DETAILS", details);
+            return details;
+          case 'weapon_properties':
+            commit("SET_WEAPON_PROPERTIES", details);
+            return details;
+          case 'subclass_level':
+            commit("SET_SUBCLASS_LEVEL_DETAILS", details);
+            return details;
+          case 'subclass_features':
+            commit("SET_SUBCLASS_FEATURES", details);
+            return details;
+          case 'feature':
+            commit("SET_SUBCLASS_FEATURE", details);
+            return details;
+          case 'equipment_list':
+            commit("SET_EQUIPMENT_LIST", details);
+            return details;
+          case 'damage_type':
+            commit("SET_DAMAGE_TYPE_DETAILS", details);
+            return details;
           default:
             break;
         }
@@ -174,7 +237,6 @@ export default createStore({
       try {
         let detail = {};
         let newIndex = index.includes('skill-') ? index.replace('skill-', '') : index;
-        //console.log(`index.js index in fetchDetailsByIndex: ${newIndex}, type: ${type}`);
         switch (type) {
           case 'ability':
             detail = await fetchAbilityScoreDetails(newIndex);
@@ -192,6 +254,43 @@ export default createStore({
             detail = await fetchEquipmentDetails(newIndex);
             commit('SET_TOOL_DETAILS', detail);
             break;
+          case 'equipment':
+            detail = await fetchEquipmentDetails(newIndex);
+            commit('SET_EQUIPMENT_DETAILS', detail);
+            break;
+          default:
+            break;
+        }
+        return detail;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async fetchEquipmentOptions({ commit }, { url, type }) {
+      try {
+        const details = await fetchDetails(url);
+        switch (type) {
+          case 'ability':
+            commit('SET_ABILITY_SCORE_DETAILS', details);
+            break;
+          case 'skill':
+            commit('SET_SKILL_DETAILS', details);
+            break;
+          case 'proficiency':
+            commit('SET_PROFICIENCY_DETAILS', details);
+            break;
+          case 'instrument':
+            commit('SET_INSTRUMENT_DETAILS', details);
+            break;
+          case 'equipment':
+            commit('SET_EQUIPMENT_DETAILS', details);
+            return details;
+          case 'subclass':
+            commit('SET_SUBCLASS_DETAILS', details);
+            return details;
+          case 'subclass_level':
+            commit('SET_SUBCLASS_LEVEL_DETAILS', details);
+            return details;
           default:
             break;
         }
@@ -217,5 +316,14 @@ export default createStore({
     abilityScoreDetails: (state) => state.abilityScoreDetails,
     instrumentDetails: (state) => state.instrumentDetails,
     proficiencyDetails: (state) => state.proficiencyDetails,
+    equipmentDetails: (state) => state.equipmentDetails,
+    weaponDetails: (state) => state.weaponDetails,
+    weaponProperties: (state) => state.weaponProperties,
+    subclassDetails: (state) => state.subclassDetails,
+    subclassLevels: (state) => state.subclassLevels,
+    subclassFeatures: (state) => state.subclassFeatures,
+    feature: (state) => state.feature,
+    equipmentList: (state) => state.equipmentList,
+    damageTypeDetails: (state) => state.damageTypeDetails,
   },
 });

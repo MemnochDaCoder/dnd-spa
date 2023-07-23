@@ -1,11 +1,11 @@
 <template>
     <div>
-        <div v-if="resolvedSkillDetails" class="mt-4">
-            <h4>{{ resolvedSkillDetails.name }}</h4>
-            <p v-for="desc in resolvedSkillDetails.desc" :key="desc">{{ desc }}</p>
-            <div v-if="resolvedSkillDetails.ability_score">
+        <div v-if="skillDetails" class="mt-4">
+            <h4>{{ skillDetails.name }}</h4>
+            <p v-for="desc in skillDetails.desc" :key="desc">{{ desc }}</p>
+            <div v-if="skillDetails.ability_score">
                 <AbilityScoreDetail
-                    v-if="abilityScoreDetails && abilityScoreDetails.index === resolvedSkillDetails.ability_score.index"
+                    v-if="abilityScoreDetails && abilityScoreDetails.index === skillDetails.ability_score.index"
                     :asd="abilityScoreDetails" />
             </div>
         </div>
@@ -28,13 +28,6 @@ export default {
     },
     computed: {
         ...mapGetters(['abilityScoreDetails']),
-        resolvedSkillDetails() {
-            if (this.skillDetails instanceof Promise) {
-                return null;
-            } else {
-                return this.skillDetails;
-            }
-        },
     },
 };
 </script>
