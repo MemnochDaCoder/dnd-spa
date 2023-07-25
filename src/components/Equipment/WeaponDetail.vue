@@ -20,20 +20,21 @@
         weaponDetails.range.normal }}</p>
     <p v-if="weaponDetails.weight"><strong>Weight:</strong> {{
         weaponDetails.weight }}</p>
-    <p v-if="weaponDetails.properties && weaponDetails.properties.length > 0">
-        <strong>Properties:</strong>
-    </p>
-    <ul v-if="weaponDetails.properties && weaponDetails.properties.length > 0">
-        <li v-for="property in weaponDetails.properties" :key="property.index" class="btn btn-outline-dark" typs="button"
-            @click="fetchWeaponProperties(property.url)">
-            {{ property.name }}
-        </li>
-    </ul>
-    <ul v-if="weaponProperties">
-        <li class="list-group-item" v-for="d in weaponProperties.desc" :key="d.index">
-            {{ d }}
-        </li>
-    </ul>
+
+    <div v-if="weaponDetails.properties && weaponDetails.properties.length > 0">
+        <p><strong>Properties:</strong></p>
+        <ul>
+            <li v-for="property in weaponDetails.properties" :key="property.index" class="btn btn-outline-dark"
+                typs="button" @click="fetchWeaponProperties(property.url)">
+                {{ property.name }}
+            </li>
+        </ul>
+        <ul v-if="weaponProperties">
+            <li class="list-group-item" v-for="d in weaponProperties.desc" :key="d.index">
+                {{ d }}
+            </li>
+        </ul>
+    </div>
 </template>
 
 <script>
