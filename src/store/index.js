@@ -201,11 +201,13 @@ export default createStore({
             break;
           case 'equipment':
             commit('SET_EQUIPMENT_DETAILS', details);
+            commit("SET_WEAPON_DETAILS", details);
             return details;
           case 'equipment_category':
             commit("SET_EQUIPMENT_CATEGORY", details);
             return details;
           case 'weapon':
+            commit('SET_EQUIPMENT_DETAILS', details);
             commit("SET_WEAPON_DETAILS", details);
             return details;
           case 'weapon_properties':

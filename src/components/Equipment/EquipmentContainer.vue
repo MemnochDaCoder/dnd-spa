@@ -8,14 +8,14 @@
     </div>
     <br />
     <br />
-    <form class="row g-3">
+    <form class="row g-3" @submit.prevent="searchEquipment">
         <div class="col-md-6">
             <label for="search" class="form-label">Equipment Name</label>
             <input type="text" class="form-control" id="search" v-model="searchQuery" placeholder="Search equipment...">
         </div>
         <div class="col-md-6">
             <br />
-            <button class="btn btn-outline-dark" type="submit" @click="searchEquipment">Search</button>
+            <button class="btn btn-outline-dark" type="submit" @click="searchEquipment" @submit.prevent="searchEquipment">Search</button>
         </div>
     </form>
     <br />
@@ -26,12 +26,13 @@
         <div v-for="section in groupedEquipmentList" :key="section.letter">
             <h3 :data-letter="section.letter">{{ section.letter }}</h3>
             <ul class="list-group">
-                <li class="list-group-item" v-for="eq in section.items" :key="eq.index"
-                    @click="toggleEquipmentDetail(eq.url, eq.index)">
+                <li class="list-group-item" v-for="eq in section.items" :key="eq.index">
                     {{ eq.name }}<br />
-                    <button class="btn btn-outline-dark" type="button">Equipment Detail</button>
+                    <button class="btn btn-outline-dark" type="button"
+                        @click="toggleEquipmentDetail(eq.url, eq.index)">Equipment
+                        Detail</button>
                     <template
-                        v-if="equipmentDetails && selectedEquipment === equipmentDetails.index && equipmentDetails.equipment_category && equipmentDetails.equipment_category.index === 'tools'">
+                        v-if="equipmentDetails && selectedEquipment === eq.index && equipmentDetails.equipment_category && equipmentDetails.equipment_category.index === 'tools'">
                         <div class="container mt-4" v-if="selectedEquipment === eq.index" style="padding: 10px;">
                             <h2>{{ equipmentDetails.name }}</h2>
                             <p><strong>Equipment Category:</strong> {{ equipmentDetails.equipment_category.name }}</p>
@@ -63,7 +64,7 @@
                         </div>
                     </template>
                     <template
-                        v-else-if="equipmentDetails && selectedEquipment === equipmentDetails.index && equipmentDetails.equipment_category && equipmentDetails.equipment_category.index === 'mounts-and-vehicles'">
+                        v-else-if="equipmentDetails && selectedEquipment === eq.index && equipmentDetails.equipment_category && equipmentDetails.equipment_category.index === 'mounts-and-vehicles'">
                         <div class="container mt-4" v-if="selectedEquipment === eq.index" style="padding: 10px;">
                             <p><strong>Vehicle Category:</strong> {{ equipmentDetails.vehicle_category }}</p>
                             <p><strong>Equipment Category:</strong> {{ equipmentDetails.equipment_category.name }}</p>
@@ -98,50 +99,11 @@
                         </div>
                     </template>
                     <template
-                        v-else-if="equipmentDetails && selectedEquipment === equipmentDetails.index && equipmentDetails.equipment_category && equipmentDetails.equipment_category.index === 'weapon'">
-                        <p><strong>Equipment Category:</strong> {{ equipmentDetails.equipment_category.name }}</p>
-                        <p><strong>Weapon Category: {{ equipmentDetails.weapon_category }}</strong></p>
-                        <p><strong>Weapon Range: {{ equipmentDetails.weapon_range }}</strong></p>
-                        <p><strong>Weapon Category: {{ equipmentDetails.category_range }}</strong></p>
-                        <p><strong>Cost:</strong> {{ equipmentDetails.cost.quantity }} {{
-                            equipmentDetails.cost.unit }}</p>
-                        <p><strong>Weight:</strong> {{ equipmentDetails.weight }}</p>
-                        <p><strong>Damage:</strong></p>
-                        <p>Damage Dice: {{ equipmentDetails.damage.damage_dice }}</p>
-                        <p>Damage Type: {{ equipmentDetails.damage.damage_type.name }}</p>
-                        <button class="btn btn-outline-dark" type="button"
-                            @click="fetchDamageTypeDetail(equipmentDetails.damage.damage_type.url, equipmentDetails.damage.damage_type.index)">
-                            Damage Type Detail
-                        </button>
-                        <div v-if="damageTypeDetails && selectedDamageType === equipmentDetails.damage.damage_type.index">
-                            <ul class="list-group">
-                                <li class="list-group-item" v-for="d in damageTypeDetails.desc" :key="d">{{ d }}</li>
-                            </ul>
-                        </div>
-                        <p><strong>Description:</strong></p>
-                        <ul>
-                            <li v-for="descItem in equipmentDetails.desc" :key="descItem">{{ descItem }}</li>
-                        </ul>
-                        <p>Cost:</p>
-                        <p>{{ equipmentDetails.cost.quantity }}{{ equipmentDetails.cost.unit }}</p>
-                        <p>Weight: {{ equipmentDetails.weight }}</p>
-                        <div v-if="equipmentDetails.contents && equipmentDetails.content.length > 0">
-                            <ul class="list-group">
-                                <li class="list-group-item" v-for="content in equipmentDetails.contents" :key="content">
-                                    {{ content }}
-                                </li>
-                            </ul>
-                        </div>
-                        <div v-if="equipmentDetails.properties && equipmentDetails.properties.length > 0">
-                            <ul class="list-group">
-                                <li v-for="properties in equipmentDetails.properties" :key="properties">
-                                    {{ properties }}
-                                </li>
-                            </ul>
-                        </div>
+                        v-else-if="equipmentDetails && selectedEquipment === eq.index && equipmentDetails.equipment_category && equipmentDetails.equipment_category.index === 'weapon'">
+                        <WeaponDetail />
                     </template>
                     <template
-                        v-else-if="equipmentDetails && selectedEquipment === equipmentDetails.index && equipmentDetails.equipment_category && equipmentDetails.equipment_category.index === 'armor'">
+                        v-else-if="equipmentDetails && selectedEquipment === eq.index && equipmentDetails.equipment_category && equipmentDetails.equipment_category.index === 'armor'">
                         <p><strong>Equipment Category:</strong> {{ equipmentDetails.equipment_category.name }}</p>
                         <p><strong>Armor Category: {{ equipmentDetails.armor_category }}</strong></p>
                         <p><strong>AC:</strong></p>
@@ -181,7 +143,7 @@
                         </div>
                     </template>
                     <template
-                        v-else-if="equipmentDetails && selectedEquipment === equipmentDetails.index && equipmentDetails.equipment_category.index === 'adventuring-gear'">
+                        v-else-if="equipmentDetails && selectedEquipment === eq.index && equipmentDetails.equipment_category.index === 'adventuring-gear'">
                         <div class="container mt-4" v-if="selectedEquipment === eq.index" style="padding: 10px;">
                             <h2>{{ equipmentDetails.name }}</h2>
                             <p><strong>Equipment Category:</strong> {{ equipmentDetails.equipment_category.name }}</p>
@@ -224,6 +186,7 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex';
+import WeaponDetail from './WeaponDetail.vue'
 
 export default {
     data() {
@@ -234,6 +197,9 @@ export default {
             searchQuery: '',
             filteredEquipmentList: null,
         };
+    },
+    components: {
+        WeaponDetail,
     },
     computed: {
         ...mapGetters(['equipmentList', 'equipmentDetails', 'damageTypeDetails']),
@@ -256,6 +222,7 @@ export default {
             else {
                 await this.fetchDetailsByUrl({ url: url, type: 'equipment' });
                 this.selectedEquipment = index;
+                console.log(this.selectedEquipment);
             }
         },
         async fetchDamageTypeDetail(url, index) {
@@ -269,7 +236,6 @@ export default {
         },
         groupEquipmentList(list) {
             if (!list || list.length <= 0 || list.results === undefined) return [];
-            console.log(list);
             const sortedList = list.results.slice().sort((a, b) => a.name.localeCompare(b.name));
 
             const grouped = [];
