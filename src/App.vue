@@ -7,24 +7,31 @@
           aria-controls="ex1-tabs-1" aria-selected="true">Spells</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" id="ex1-tab-2" data-bs-toggle="pill" href="#ex1-tabs-2" role="tab"
-          aria-controls="ex1-tabs-2" aria-selected="false">Classes</a>
+        <a class="nav-link" id="ex1-tab-2" data-bs-toggle="pill" href="#ex1-tabs-2" role="tab" aria-controls="ex1-tabs-2"
+          aria-selected="false">Classes</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" id="ex1-tab-3" data-bs-toggle="pill" href="#ex1-tabs-3" role="tab"
-          aria-controls="ex1-tabs-3" aria-selected="false">Equipment</a>
+        <a class="nav-link" id="ex1-tab-3" data-bs-toggle="pill" href="#ex1-tabs-3" role="tab" aria-controls="ex1-tabs-3"
+          aria-selected="false">Equipment</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="ex1-tab-4" data-bs-toggle="pill" href="#ex1-tabs-4" role="tab" aria-controls="ex1-tabs-4"
+          aria-selected="false">Magic items</a> <!-- Updated href here -->
       </li>
     </ul>
     <!-- Tab Content -->
     <div class="tab-content">
       <div class="tab-pane fade show active" id="ex1-tabs-1" role="tabpanel" aria-labelledby="ex1-tab-1">
-        <SpellContainer></SpellContainer>
+        <SpellContainer />
       </div>
       <div class="tab-pane fade" id="ex1-tabs-2" role="tabpanel" aria-labelledby="ex1-tab-2">
-        <ClassContainer></ClassContainer>
+        <ClassContainer />
       </div>
       <div class="tab-pane fade" id="ex1-tabs-3" role="tabpanel" aria-labelledby="ex1-tab-3">
         <EquipmentContainer />
+      </div>
+      <div class="tab-pane fade" id="ex1-tabs-4" role="tabpanel" aria-labelledby="ex1-tab-4">
+        <MagicItemsContainer />
       </div>
     </div>
   </div>
@@ -34,6 +41,7 @@
 import SpellContainer from './components/Spells/SpellContainer.vue';
 import ClassContainer from './components/Classes/ClassContainer.vue';
 import EquipmentContainer from './components/Equipment/EquipmentContainer.vue';
+import MagicItemsContainer from './components/Equipment/MagicItemsContainer.vue';
 
 export default {
   name: 'App',
@@ -41,6 +49,7 @@ export default {
     SpellContainer,
     ClassContainer,
     EquipmentContainer,
+    MagicItemsContainer,
   },
 };
 </script>

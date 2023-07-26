@@ -28,6 +28,8 @@ export default createStore({
     feature: {},
     equipmentList: {},
     damageTypeDetails: {},
+    magicItemList: {},
+    magicItemDetail: {},
   },
   mutations: {
     SET_CLASSES(state, classes) {
@@ -107,6 +109,12 @@ export default createStore({
     SET_DAMAGE_TYPE_DETAILS(state, details) {
       state.damageTypeDetails = details;
     },
+    SET_MAGIC_ITEM_LIST(state, details) {
+      state.magicItemList = details;
+    },
+    SET_MAGIC_ITEM_DETAIL(state, details){
+      state.magicItemDetail = details;
+    }
   },
   actions: {
     async fetchClasses({ commit }) {
@@ -226,7 +234,11 @@ export default createStore({
             commit("SET_EQUIPMENT_LIST", details);
             return details;
           case 'damage_type':
-            commit("SET_DAMAGE_TYPE_DETAILS", details);
+          case 'magic_item_list':
+            commit("SET_MAGIC_ITEM_LIST", details);
+            return details;
+          case 'magic_item_detail':
+            commit("SET_MAGIC_ITEM_DETAIL", details);
             return details;
           default:
             break;
@@ -327,5 +339,7 @@ export default createStore({
     feature: (state) => state.feature,
     equipmentList: (state) => state.equipmentList,
     damageTypeDetails: (state) => state.damageTypeDetails,
+    magicItemList: (state) => state.magicItemList,
+    magicItemDetail: (state) => state.magicItemDetail,
   },
 });
