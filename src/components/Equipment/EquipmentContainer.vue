@@ -13,10 +13,6 @@
             <label for="search" class="form-label">Equipment Name</label>
             <input type="text" class="form-control" id="search" v-model="searchQuery" placeholder="Search equipment...">
         </div>
-        <div class="col-md-6">
-            <br />
-            <button class="btn btn-outline-dark" type="submit" @click="searchEquipment" @submit.prevent="searchEquipment">Search</button>
-        </div>
     </form>
     <br />
     <br />
@@ -257,7 +253,7 @@ export default {
             return grouped;
         },
         scrollToSection(letter) {
-            const element = document.querySelector(`[data-letter="${letter}"]`);
+            const element = this.$el.querySelector(`[data-letter="${letter}"]`);
             if (element) {
                 element.scrollIntoView({ behavior: 'smooth' });
             }
