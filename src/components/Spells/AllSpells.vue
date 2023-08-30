@@ -21,7 +21,7 @@
                             <h5 class="mb-1">{{ spell.name }}</h5>
                             <small v-if="spell.level">Level: {{ spell.level }}</small>
                         </div>
-                        <p class="mb-1" v-if="spellDetails && spellDetails.index === currentSpellIndex">
+                        <p class="mb-1" v-if="isSpellDetailVisible(spell)">
                             <SpellDetails :spell="spellDetails"></SpellDetails>
                         </p>
                     </button>
@@ -37,6 +37,11 @@ import SpellDetails from './SpellDetails.vue';
 
 export default {
     name: 'AllSpells',
+    data() {
+        return {
+            expandedSpells: null,
+        }
+    },
     components: {
         SpellDetails,
     },
@@ -52,14 +57,22 @@ export default {
             });
             return Array.from(letters).sort();
         },
+        isSpellDetailsVisible() {
+            return this.spellDetails && this.currentSpellIndex === this.spellDetails.index;
+        },
     },
     methods: {
         toggleSpellDetails(spell) {
-            if (this.currentSpellIndex === spell.index ?? '') {
+            if (this.expandedSpellIndex === spell.index) {
+                this.expandedSpellIndex = null;
                 this.$store.dispatch('fetchSpellDetails', null);
             } else {
+                this.expandedSpellIndex = spell.index;
                 this.$store.dispatch('fetchSpellDetails', spell.index);
             }
+        },
+        isSpellDetailVisible(spell) {
+            return this.isSpellDetailsVisible && this.expandedSpellIndex === spell.index;
         },
         getSpellsByLetter(letter) {
             return this.spells.filter((spell) => spell.name.charAt(0).toUpperCase() === letter);

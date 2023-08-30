@@ -28,8 +28,13 @@ export default createStore({
     feature: {},
     equipmentList: {},
     damageTypeDetails: {},
+    damageTypes: [],
     magicItemList: {},
     magicItemDetail: {},
+    heavyArmor: [],
+    mediumArmor: [],
+    lightArmor: [],
+    wondrousItems: [],
   },
   mutations: {
     SET_CLASSES(state, classes) {
@@ -112,9 +117,24 @@ export default createStore({
     SET_MAGIC_ITEM_LIST(state, details) {
       state.magicItemList = details;
     },
-    SET_MAGIC_ITEM_DETAIL(state, details){
+    SET_MAGIC_ITEM_DETAIL(state, details) {
       state.magicItemDetail = details;
-    }
+    },
+    SET_DAMAGE_TYPES(state, details) {
+      state.damageTypes = details;
+    },
+    SET_HEAVY_ARMOR(state, details) {
+      state.heavyArmor = details;
+    },
+    SET_MEDIUM_ARMOR(state, details) {
+      state.mediumArmor = details;
+    },
+    SET_LIGHT_ARMOR(state, details) {
+      state.lightArmor = details;
+    },
+    SET_WONDROUS_ITEMS(state, details) {
+      state.wondrousItems = details;
+    },
   },
   actions: {
     async fetchClasses({ commit }) {
@@ -188,8 +208,9 @@ export default createStore({
       commit('SET_FILTERED_SPELLS', []);
     },
     async fetchDetails(url) {
-      if (typeof url === 'object') throw new Error(`URL: ${url}`);
-      return await fetchDetails(url.toString());
+      if (typeof url === 'object') return;
+      let data = await fetchDetails(url.toString());
+      return await data;
     },
     async fetchDetailsByUrl({ commit }, { url, type }) {
       try {
@@ -234,6 +255,8 @@ export default createStore({
             commit("SET_EQUIPMENT_LIST", details);
             return details;
           case 'damage_type':
+            commit('SET_DAMAGE_TYPES', details.results);
+            break;
           case 'magic_item_list':
             commit("SET_MAGIC_ITEM_LIST", details);
             return details;
@@ -312,6 +335,66 @@ export default createStore({
         console.error(error);
       }
     },
+    async fetchArmors() {
+      const heavy = await fetchDetails('/api/equipment-categories/heavy-armor');
+      const medium = await fetchDetails('/api/equipment-categories/medium-armor');
+      const light = await fetchDetails('/api/equipment-categories/light-armor');
+
+      this.commit('SET_HEAVY_ARMOR', heavy.equipment);
+      this.commit('SET_MEDIUM_ARMOR', medium.equipment);
+      this.commit('SET_LIGHT_ARMOR', light.equipment);
+    },
+    async fetchWondrousItems() {
+      const ft = await fetchDetails("/api/magic-items/feather-token");
+      const fwp = await fetchDetails("/api/magic-items/figurine-of-wondrous-power");
+      const rw = await fetchDetails("/api/equipment-categories/ranged-weapons");
+      const mw = await fetchDetails("/api/equipment-categories/martial-weapons");
+      const sw = await fetchDetails("/api/equipment-categories/simple-weapons");
+
+      const wondrousItems = [
+        { "type": "FeatherToken", "variants": ft.variants },
+        { "type": "FigurineOfWondrousPower", "variants": fwp.variants },
+        { "type": "RangedWeapons", "variants": rw.equipment },
+        { "type": "MartialWeapons", "variants": mw.equipment },
+        { "type": "SimpleWeapons", "variants": sw.equipment },
+      ];
+
+      const promises = wondrousItems.map(item => this.dispatch('fetchDetails', item.url));
+      const results = await Promise.all(promises);
+
+      // Merge the results with the item types
+      let mergedWondrousItems = wondrousItems.map((item, index) => ({ ...item, detail: results[index] }));
+
+      // Commit the result to the store
+      this.commit('SET_WONDROUS_ITEMS', mergedWondrousItems);
+    },
+    async fetchSpellsByLevel() {
+      let display = [[], [], [], [], [], [], [], [], [], []];
+
+      let cantrips = await fetchDetails('/api/spells?level=0');
+      let lOne = await fetchDetails('/api/spells?level=1');
+      let lTwo = await fetchDetails('/api/spells?level=2');
+      let lThree = await fetchDetails('/api/spells?level=3');
+      let lFour = await fetchDetails('/api/spells?level=4');
+      let lFive = await fetchDetails('/api/spells?level=5');
+      let lSix = await fetchDetails('/api/spells?level=6');
+      let lSeven = await fetchDetails('/api/spells?level=7');
+      let lEight = await fetchDetails('/api/spells?level=8');
+      let lNine = await fetchDetails('/api/spells?level=9');
+
+      display[0] = cantrips.results;
+      display[1] = lOne.results;
+      display[2] = lTwo.results;
+      display[3] = lThree.results;
+      display[4] = lFour.results;
+      display[5] = lFive.results;
+      display[6] = lSix.results;
+      display[7] = lSeven.results;
+      display[8] = lEight.results;
+      display[9] = lNine.results;
+
+      return display;
+    },
   },
   getters: {
     classes: (state) => state.classes,
@@ -339,7 +422,13 @@ export default createStore({
     feature: (state) => state.feature,
     equipmentList: (state) => state.equipmentList,
     damageTypeDetails: (state) => state.damageTypeDetails,
+    damageTypes: (state) => state.damageTypes,
     magicItemList: (state) => state.magicItemList,
     magicItemDetail: (state) => state.magicItemDetail,
+    equipmentCategory: (state) => state.equipmentCategory,
+    heavyArmor: (state) => state.heavyArmor,
+    mediumArmor: (state) => state.mediumArmor,
+    lightArmor: (state) => state.lightArmor,
+    wondrousItems: (state) => state.wondrousItems,
   },
 });
