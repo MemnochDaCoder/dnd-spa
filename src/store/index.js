@@ -13,6 +13,7 @@ export default createStore({
     selectedClassIndex: null,
     classDetails: {},
     classSpells: [],
+    classProficiencies: [],
     skillDetails: {},
     abilityScoreDetails: {},
     instrumentDetails: {},
@@ -134,6 +135,9 @@ export default createStore({
     },
     SET_WONDROUS_ITEMS(state, details) {
       state.wondrousItems = details;
+    },
+    SET_CLASS_PROFICIENCIES(state, details){
+      state.classProficiencies = details;
     },
   },
   actions: {
@@ -395,6 +399,10 @@ export default createStore({
 
       return display;
     },
+    async fetchProficiencies(className){
+      let cP = await fetchDetails(`/api/classes/${className}/proficiencies`);
+      this.commit('SET_CLASS_PROFICIENCIES', cP.results);
+    },
   },
   getters: {
     classes: (state) => state.classes,
@@ -405,6 +413,7 @@ export default createStore({
     },
     classDetails: (state) => state.classDetails,
     classSpells: (state) => state.classSpells,
+    classProficiencies: (state) => state.classProficiencies,
     spells: (state) => state.spells,
     spellDetails: (state) => state.spellDetails,
     currentSpellIndex: (state) => state.currentSpellIndex,

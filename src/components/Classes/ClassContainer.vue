@@ -41,6 +41,7 @@
 <script>
 import ClassDetails from './ClassDetails.vue';
 import Spells from '../Spells/AllSpells.vue';
+import Proficiencies from '../Classes/ProficiencyContainer.vue'
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -48,6 +49,7 @@ export default {
     components: {
         ClassDetails,
         Spells,
+        Proficiencies,
     },
     computed: {
         ...mapGetters(['classes', 'classDetails', 'classSpells']),
@@ -59,7 +61,7 @@ export default {
         this.fetchClasses();
     },
     methods: {
-        ...mapActions(['fetchClasses', 'fetchClassDetails', 'fetchClassSpells']),
+        ...mapActions(['fetchClasses', 'fetchClassDetails', 'fetchClassSpells', 'fetchProficiencies']),
         toggleResponseData(dndClass, type) {
             const showProperty = 'show' + type.charAt(0).toUpperCase() + type.slice(1);
             const fetchAction = 'fetchClass' + type.charAt(0).toUpperCase() + type.slice(1);
