@@ -32,6 +32,7 @@
                 <div class="response-data mt-3">
                     <Spells v-if="dndClass.showSpells && classSpells" />
                     <ClassDetails v-if="dndClass.showDetails && classDetails" />
+                    <Proficiencies v-if="dndClass.showDetails && classProficiencies" />
                 </div>
             </li>
         </ul>
@@ -52,9 +53,12 @@ export default {
         Proficiencies,
     },
     computed: {
-        ...mapGetters(['classes', 'classDetails', 'classSpells']),
+        ...mapGetters(['classes', 'classDetails', 'classSpells', 'classProficiencies']),
         spells() {
-            return this.classSpells;
+            return {
+                classSpells: [],
+                classProficiencies: [],
+            }
         },
     },
     mounted() {
@@ -76,6 +80,7 @@ export default {
                 }
                 type === 'details' ? (dndClass.showDetails = true) : (dndClass.showDetails = false);
                 type === 'spells' ? (dndClass.showSpells = !dndClass.showSpells) : (dndClass.showSpells = false);
+                type === 'proficiencies' ? (dndClass.showProficiencies = !dndClass.showProficiencies) : (dndClass.showProficiencies = false);
             } else {
                 dndClass.responseData = { ...dndClass.responseData, [type]: null };
             }
@@ -90,6 +95,11 @@ export default {
             if (type === 'spells') {
                 this.fetchClassSpells(classIndex).then((responseData) => {
                     dndClass.responseData = { ...dndClass.responseData, spells: responseData };
+                });
+            }
+            if (type === 'proficiencies') {
+                this.fetchProficiencies(classIndex).then((responseData) => {
+                    dndClass.responseData = { ...dndClass.responseData, proficiencies: responseData };
                 });
             }
         },

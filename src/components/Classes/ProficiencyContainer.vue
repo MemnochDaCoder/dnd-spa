@@ -26,12 +26,15 @@ export default {
     },
     computed: {
         ...mapGetters(['classProficiencies']),
+        proficiencies(){
+            return this.classProficiencies;
+        }
     },
     methods: {
         ...mapActions['fetchProficiencies'],
         async getProficiencies(className) {
-            classProficiencies = await this.fetchProficiencies(className);
+            this.classProficiencies = await this.fetchProficiencies(className);
         }
-    }
+    },
 }
 </script>
