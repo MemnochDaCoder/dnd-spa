@@ -399,7 +399,7 @@ export default createStore({
 
       return display;
     },
-    async fetchProficiencies(className){
+    async fetchClassProficiencies(className){
       let cP = await fetchDetails(`/api/classes/${className}/proficiencies`);
       this.commit('SET_CLASS_PROFICIENCIES', cP.results);
     },

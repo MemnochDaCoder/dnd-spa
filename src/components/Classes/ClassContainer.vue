@@ -65,7 +65,7 @@ export default {
         this.fetchClasses();
     },
     methods: {
-        ...mapActions(['fetchClasses', 'fetchClassDetails', 'fetchClassSpells', 'fetchProficiencies']),
+        ...mapActions(['fetchClasses', 'fetchClassDetails', 'fetchClassSpells', 'fetchClassProficiencies']),
         toggleResponseData(dndClass, type) {
             const showProperty = 'show' + type.charAt(0).toUpperCase() + type.slice(1);
             const fetchAction = 'fetchClass' + type.charAt(0).toUpperCase() + type.slice(1);
@@ -98,7 +98,7 @@ export default {
                 });
             }
             if (type === 'proficiencies') {
-                this.fetchProficiencies(classIndex).then((responseData) => {
+                this.fetchClassProficiencies(classIndex).then((responseData) => {
                     dndClass.responseData = { ...dndClass.responseData, proficiencies: responseData };
                 });
             }

@@ -5,7 +5,8 @@
                 <tbody>
                     <td>
                         <ul>
-                            <li v-for="p in classProficiencies" :key="p">
+                            <li v-for="p in getProficiencies" :key="p">
+                                {{ p.name }}
                             </li>
                         </ul>
                     </td>
@@ -19,11 +20,6 @@
 import { mapActions, mapGetters } from 'vuex';
 
 export default {
-    data() {
-        return {
-            classProficiencies: [],
-        }
-    },
     computed: {
         ...mapGetters(['classProficiencies']),
         proficiencies(){
