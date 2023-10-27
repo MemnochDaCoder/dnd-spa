@@ -92,7 +92,7 @@
             <tr>
                 <th>School:</th>
                 <td>
-                    <span v-for="(value, key) in spell.school" :key="value" class="badge bg-warning">{{ key }}: {{ value
+                    <span class="badge bg-warning">{{ spell.school.name
                     }}</span>
                 </td>
             </tr>
@@ -102,16 +102,12 @@
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th>Index</th>
                                 <th>Name</th>
-                                <th>URL</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="sc in spell.classes" :key="sc.index">
-                                <td>{{ sc.index }}</td>
                                 <td>{{ sc.name }}</td>
-                                <td>{{ sc.url }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -123,24 +119,16 @@
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th>Index</th>
                                 <th>Name</th>
-                                <th>URL</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="sc in spell.subclasses" :key="sc.index">
-                                <td>{{ sc.index }}</td>
                                 <td>{{ sc.name }}</td>
-                                <td>{{ sc.url }}</td>
                             </tr>
                         </tbody>
                     </table>
                 </td>
-            </tr>
-            <tr>
-                <th>URL:</th>
-                <td>{{ spell.url }}</td>
             </tr>
         </table>
     </div>

@@ -218,7 +218,6 @@ export default {
             else {
                 await this.fetchDetailsByUrl({ url: url, type: 'equipment' });
                 this.selectedEquipment = index;
-                console.log(this.selectedEquipment);
             }
         },
         async fetchDamageTypeDetail(url, index) {

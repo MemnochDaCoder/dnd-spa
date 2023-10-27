@@ -32,6 +32,7 @@
                 <div class="response-data mt-3">
                     <Spells v-if="dndClass.showSpells && classSpells" />
                     <ClassDetails v-if="dndClass.showDetails && classDetails" />
+                    <Proficiencies v-if="dndClass.showDetails && classProficiencies" />
                 </div>
             </li>
         </ul>
@@ -41,6 +42,7 @@
 <script>
 import ClassDetails from './ClassDetails.vue';
 import Spells from '../Spells/AllSpells.vue';
+import Proficiencies from '../Classes/ProficiencyContainer.vue'
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -48,18 +50,22 @@ export default {
     components: {
         ClassDetails,
         Spells,
+        Proficiencies,
     },
     computed: {
-        ...mapGetters(['classes', 'classDetails', 'classSpells']),
+        ...mapGetters(['classes', 'classDetails', 'classSpells', 'classProficiencies']),
         spells() {
-            return this.classSpells;
+            return {
+                classSpells: [],
+                classProficiencies: [],
+            }
         },
     },
     mounted() {
         this.fetchClasses();
     },
     methods: {
-        ...mapActions(['fetchClasses', 'fetchClassDetails', 'fetchClassSpells']),
+        ...mapActions(['fetchClasses', 'fetchClassDetails', 'fetchClassSpells', 'fetchProficiencies']),
         toggleResponseData(dndClass, type) {
             const showProperty = 'show' + type.charAt(0).toUpperCase() + type.slice(1);
             const fetchAction = 'fetchClass' + type.charAt(0).toUpperCase() + type.slice(1);
@@ -74,6 +80,7 @@ export default {
                 }
                 type === 'details' ? (dndClass.showDetails = true) : (dndClass.showDetails = false);
                 type === 'spells' ? (dndClass.showSpells = !dndClass.showSpells) : (dndClass.showSpells = false);
+                type === 'proficiencies' ? (dndClass.showProficiencies = !dndClass.showProficiencies) : (dndClass.showProficiencies = false);
             } else {
                 dndClass.responseData = { ...dndClass.responseData, [type]: null };
             }
@@ -88,6 +95,11 @@ export default {
             if (type === 'spells') {
                 this.fetchClassSpells(classIndex).then((responseData) => {
                     dndClass.responseData = { ...dndClass.responseData, spells: responseData };
+                });
+            }
+            if (type === 'proficiencies') {
+                this.fetchProficiencies(classIndex).then((responseData) => {
+                    dndClass.responseData = { ...dndClass.responseData, proficiencies: responseData };
                 });
             }
         },
