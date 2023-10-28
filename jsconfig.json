@@ -4,10 +4,12 @@
     "module": "esnext",
     "baseUrl": "./",
     "moduleResolution": "node",
+    "outDir": "out",
+    "sourceMap": true,
     "paths": {
       "@/*": [
         "src/*"
-      ]
+      ],
     },
     "lib": [
       "esnext",
@@ -15,5 +17,5 @@
       "dom.iterable",
       "scripthost"
     ]
-  }
+  },
 }

@@ -12,7 +12,7 @@ export default createStore({
     classes: [],
     selectedClassIndex: null,
     classDetails: {},
-    classSpells: [],
+    classSpells: {},
     classProficiencies: [],
     skillDetails: {},
     abilityScoreDetails: {},
@@ -47,12 +47,8 @@ export default createStore({
     SET_CLASS_DETAILS(state, { details }) {
       state.classDetails = details;
     },
-    SET_CLASS_SPELLS(state, { classIndex, spells }) {
-      const classObj = state.classes.find((cls) => cls.index === classIndex);
-      if (classObj) {
-        classObj.responseData = { ...classObj.responseData, spells };
-      }
-      state.spells = spells;
+    SET_CLASS_SPELLS(state, spells) {
+      state.classSpells = spells;
     },
     SET_SPELLS(state, spells) {
       state.spells = spells;
@@ -136,7 +132,7 @@ export default createStore({
     SET_WONDROUS_ITEMS(state, details) {
       state.wondrousItems = details;
     },
-    SET_CLASS_PROFICIENCIES(state, details){
+    SET_CLASS_PROFICIENCIES(state, details) {
       state.classProficiencies = details;
     },
   },
@@ -159,9 +155,9 @@ export default createStore({
     },
     async fetchClassSpells({ commit }, classIndex) {
       try {
-        const spells = await fetchClassSpells(classIndex);
-        commit('SET_CLASS_SPELLS', { classIndex, spells });
-        return spells;
+        let spells = await fetchClassSpells(classIndex);
+        commit('SET_CLASS_SPELLS', spells);
+
       } catch (error) {
         console.error(error);
       }
@@ -399,9 +395,14 @@ export default createStore({
 
       return display;
     },
-    async fetchClassProficiencies(className){
-      let cP = await fetchDetails(`/api/classes/${className}/proficiencies`);
-      this.commit('SET_CLASS_PROFICIENCIES', cP.results);
+    async fetchClassProficiencies({ commit }, className) {
+      try {
+        let cP = await fetchDetails(`/api/classes/${className}/proficiencies`);
+        commit('SET_CLASS_PROFICIENCIES', cP.results);
+      }
+      catch (error) {
+        console.log(error);
+      }
     },
   },
   getters: {

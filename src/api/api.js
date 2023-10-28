@@ -91,7 +91,7 @@ export async function fetchClassDetails(classIndex) {
 }
 
 export async function fetchClassSpells(classIndex) {
-  const response = await fetch(`https://www.dnd5eapi.co/api/classes/${classIndex}/spells`);
+  const response = await fetch(`https://www.dnd5eapi.co/api/classes/${classIndex}/spellcasting`);
   const data = await response.json();
   return data;
 }
