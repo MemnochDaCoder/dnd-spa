@@ -32,7 +32,7 @@
                 <div class="response-data mt-3">
                     <Spells v-if="dndClass.showSpells && classSpells" />
                     <ClassDetails v-if="dndClass.showDetails && classDetails" />
-                    <Proficiencies v-if="dndClass.showDetails && classProficiencies" />
+                    <Proficiencies v-if="dndClass.showProficiencies && this.classProficiencies" />
                 </div>
             </li>
         </ul>
@@ -41,7 +41,7 @@
 
 <script>
 import ClassDetails from './ClassDetails.vue';
-import Spells from '../Spells/AllSpells.vue';
+import Spells from '../Classes/ClassSpells.vue';
 import Proficiencies from '../Classes/ProficiencyContainer.vue'
 import { mapGetters, mapActions } from 'vuex';
 
@@ -54,12 +54,6 @@ export default {
     },
     computed: {
         ...mapGetters(['classes', 'classDetails', 'classSpells', 'classProficiencies']),
-        spells() {
-            return {
-                classSpells: [],
-                classProficiencies: [],
-            }
-        },
     },
     mounted() {
         this.fetchClasses();
@@ -78,9 +72,9 @@ export default {
                         this.$store.dispatch(fetchAction, classIndex);
                     }
                 }
-                type === 'details' ? (dndClass.showDetails = true) : (dndClass.showDetails = false);
-                type === 'spells' ? (dndClass.showSpells = !dndClass.showSpells) : (dndClass.showSpells = false);
-                type === 'proficiencies' ? (dndClass.showProficiencies = !dndClass.showProficiencies) : (dndClass.showProficiencies = false);
+                type === 'details' ? (dndClass.showDetails === dndClass.showDetails) : (dndClass.showDetails = false);
+                type === 'spells' ? (dndClass.showSpells === dndClass.showSpells) : (dndClass.showSpells = false);
+                type === 'proficiencies' ? (dndClass.showProficiencies === dndClass.showProficiencies) : (dndClass.showProficiencies = false);
             } else {
                 dndClass.responseData = { ...dndClass.responseData, [type]: null };
             }
