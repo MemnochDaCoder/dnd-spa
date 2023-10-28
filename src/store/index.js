@@ -13,7 +13,8 @@ export default createStore({
     selectedClassIndex: null,
     classDetails: {},
     classSpells: {},
-    classProficiencies: [],
+    classProficiencies: {},
+    classFeatures: {},
     skillDetails: {},
     abilityScoreDetails: {},
     instrumentDetails: {},
@@ -134,6 +135,9 @@ export default createStore({
     },
     SET_CLASS_PROFICIENCIES(state, details) {
       state.classProficiencies = details;
+    },
+    SET_CLASS_FEATURES(state, details) {
+      state.classFeatures = details;
     },
   },
   actions: {
@@ -404,6 +408,15 @@ export default createStore({
         console.log(error);
       }
     },
+    async fetchClassFeatures({ commit }, className) {
+      try {
+        let f = await fetchDetails(`/api/classes/${className}/features`);
+        commit('SET_CLASS_FEATURES', f.results);
+      }
+      catch (error) {
+        console.log(error);
+      }
+    },
   },
   getters: {
     classes: (state) => state.classes,
@@ -415,6 +428,7 @@ export default createStore({
     classDetails: (state) => state.classDetails,
     classSpells: (state) => state.classSpells,
     classProficiencies: (state) => state.classProficiencies,
+    classFeatures: (state) => state.classFeatures,
     spells: (state) => state.spells,
     spellDetails: (state) => state.spellDetails,
     currentSpellIndex: (state) => state.currentSpellIndex,
