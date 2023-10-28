@@ -15,6 +15,7 @@ export default createStore({
     classSpells: {},
     classProficiencies: {},
     classFeatures: {},
+    classSubclasses: {},
     skillDetails: {},
     abilityScoreDetails: {},
     instrumentDetails: {},
@@ -139,6 +140,9 @@ export default createStore({
     SET_CLASS_FEATURES(state, details) {
       state.classFeatures = details;
     },
+    SET_SUBCLASSES(state, details){
+      state.classSubclasses = details;
+    }
   },
   actions: {
     async fetchClasses({ commit }) {
@@ -417,6 +421,15 @@ export default createStore({
         console.log(error);
       }
     },
+    async fetchClassSubclasses({ commit }, className) {
+      try {
+        let s = await fetchDetails(`/api/classes/${className}/subclasses`);
+        commit('SET_SUBCLASSES', s);
+      }
+      catch (error) {
+        console.log(error);
+      }
+    },
   },
   getters: {
     classes: (state) => state.classes,
@@ -429,6 +442,7 @@ export default createStore({
     classSpells: (state) => state.classSpells,
     classProficiencies: (state) => state.classProficiencies,
     classFeatures: (state) => state.classFeatures,
+    classSubclasses: (state) => state.classSubclasses,
     spells: (state) => state.spells,
     spellDetails: (state) => state.spellDetails,
     currentSpellIndex: (state) => state.currentSpellIndex,
