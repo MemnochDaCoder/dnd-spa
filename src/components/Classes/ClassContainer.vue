@@ -34,6 +34,7 @@
                     <ClassDetails v-if="dndClass.showDetails && classDetails" />
                     <Proficiencies v-if="dndClass.showProficiencies && this.classProficiencies" />
                     <Features v-if="dndClass.showFeatures && this.classFeatures" />
+                    <Subclasses v-if="dndClass.showSubclasses && this.classSubclasses" />
                 </div>
             </li>
         </ul>
@@ -45,6 +46,7 @@ import ClassDetails from './ClassDetails.vue';
 import Spells from '../Classes/ClassSpells.vue';
 import Proficiencies from '../Classes/ProficiencyContainer.vue'
 import Features from '../Classes/ClassFeaturesContainer.vue'
+import Subclasses from '../Classes/ClassSubclassesContainer.vue'
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -53,34 +55,40 @@ export default {
         ClassDetails,
         Spells,
         Proficiencies,
-        Features
+        Features,
+        Subclasses
     },
     computed: {
-        ...mapGetters(['classes', 'classDetails', 'classSpells', 'classProficiencies', 'classFeatures']),
+        ...mapGetters(['classes', 'classDetails', 'classSpells', 'classProficiencies', 'classFeatures', 'classSubclasses']),
     },
     mounted() {
         this.fetchClasses();
     },
     methods: {
-        ...mapActions(['fetchClasses', 'fetchClassDetails', 'fetchClassSpells', 'fetchClassProficiencies', 'fetchClassFeatures']),
+        ...mapActions(['fetchClasses', 'fetchClassDetails', 'fetchClassSpells', 'fetchClassProficiencies', 'fetchClassFeatures', 'fetchSubclasses']),
         toggleResponseData(dndClass, type) {
+            const types = ['details', 'spells', 'proficiencies', 'features', 'subclasses'];
             const showProperty = 'show' + type.charAt(0).toUpperCase() + type.slice(1);
             const fetchAction = 'fetchClass' + type.charAt(0).toUpperCase() + type.slice(1);
-            dndClass[showProperty] = !dndClass[showProperty];
 
+            // If the section is already displayed, hide it and return
             if (dndClass[showProperty]) {
-                if (!dndClass.responseData || !dndClass.responseData[type]) {
-                    const classIndex = dndClass.index;
-                    if (classIndex !== undefined) {
-                        this.$store.dispatch(fetchAction, classIndex);
-                    }
-                }
-                type === 'details' ? (dndClass.showDetails === dndClass.showDetails) : (dndClass.showDetails = false);
-                type === 'spells' ? (dndClass.showSpells === dndClass.showSpells) : (dndClass.showSpells = false);
-                type === 'proficiencies' ? (dndClass.showProficiencies === dndClass.showProficiencies) : (dndClass.showProficiencies = false);
-                type === 'features' ? (dndClass.showFeatures === dndClass.showFeatures) : (dndClass.showFeatures = false);
-            } else {
-                dndClass.responseData = { ...dndClass.responseData, [type]: null };
+                dndClass[showProperty] = false;
+                return;
+            }
+
+            // Hide all sections
+            types.forEach((t) => {
+                const prop = 'show' + t.charAt(0).toUpperCase() + t.slice(1);
+                dndClass[prop] = false;
+            });
+
+            // Fetch data and display the clicked section
+            const classIndex = dndClass.index;
+            if (classIndex !== undefined) {
+                this.$store.dispatch(fetchAction, classIndex).then(() => {
+                    dndClass[showProperty] = true;
+                });
             }
         },
         fetchData(dndClass, type) {
@@ -101,6 +109,11 @@ export default {
                 });
             }
             if (type === 'features') {
+                this.fetchClassFeatures(classIndex).then((responseData) => {
+                    dndClass.responseData = { ...dndClass.responseData, proficiencies: responseData };
+                });
+            }
+            if (type === 'subclasses') {
                 this.fetchClassFeatures(classIndex).then((responseData) => {
                     dndClass.responseData = { ...dndClass.responseData, proficiencies: responseData };
                 });
