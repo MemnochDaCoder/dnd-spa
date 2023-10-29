@@ -33,11 +33,11 @@ export default {
     methods: {
         ...mapActions(['fetchSpells', 'applyFilters']),
         applyFilters() {
-            this.fetchSpells();
+            this.spells.length !== 0 ? this.fetchSpells() : void(0);
         },
     },
     created() {
-        this.fetchSpells();
+        this.spells.length !== 0 ? this.fetchSpells() : void(0);
     },
 };
 </script>
